@@ -9,6 +9,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Geliştirme yardımcısı: kilit ekranını PNG olarak çiz ve çık.
         let args = CommandLine.arguments
+        if args.contains("--check") {
+            let text = Permissions.diagnostics()
+            print(text)
+            try? text.write(toFile: "/tmp/tv-check.txt", atomically: true, encoding: .utf8)
+            NSApp.terminate(nil)
+            return
+        }
         if let i = args.firstIndex(of: "--render"), i + 1 < args.count {
             let mode = (i + 2 < args.count && !args[i + 2].hasPrefix("-")) ? args[i + 2] : "lock"
             MainActor.assumeIsolated { RenderPreview.run(path: args[i + 1], mode: mode) }

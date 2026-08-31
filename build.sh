@@ -59,8 +59,16 @@ cp Resources/Info.plist "$APP/Contents/Info.plist"
 cp "$OUT_DIR/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 
-echo "▸ İmzalanıyor (ad-hoc)…"
-codesign --force --deep --sign - --identifier "$BUNDLE_ID" "$APP"
+SIGN_IDENTITY="${SIGN_IDENTITY:-Yerel Kod Imzasi}"
+if security find-certificate -c "$SIGN_IDENTITY" >/dev/null 2>&1; then
+  echo "▸ İmzalanıyor ($SIGN_IDENTITY)…"
+  codesign --force --deep --sign "$SIGN_IDENTITY" --identifier "$BUNDLE_ID" "$APP"
+  STABLE_SIGN=1
+else
+  echo "▸ İmzalanıyor (ad-hoc)…"
+  codesign --force --deep --sign - --identifier "$BUNDLE_ID" "$APP"
+  STABLE_SIGN=0
+fi
 
 if [ "$INSTALL" = "1" ]; then
   echo "▸ /Applications içine kopyalanıyor…"
@@ -71,6 +79,10 @@ if [ "$INSTALL" = "1" ]; then
 fi
 
 echo "✓ Hazır: $APP"
+if [ "$STABLE_SIGN" = "0" ]; then
+  echo "⚠︎  Ad-hoc imzalandı: her derlemede imza özeti değiştiği için macOS izinleri"
+  echo "   (Erişilebilirlik) geçersiz olur. Kalıcı çözüm: ./Scripts/setup-signing.sh"
+fi
 
 if [ "$RUN" = "1" ]; then
   osascript -e 'quit app "Temizlik Vakti"' >/dev/null 2>&1 || true

@@ -43,11 +43,36 @@ Girişi kilitlemek için macOS'un **Erişilebilirlik** iznine ihtiyaç var:
    *Temizlik Vakti*'ni aç
 3. Panelde **Yenile**'ye bas
 
-Uygulamayı yeniden derlediğinde imza değişir ve macOS izni geçersiz sayabilir:
+### İzni bir kez ver, kalıcı olsun
+
+macOS, Erişilebilirlik iznini uygulamanın **kod imzasına** bağlar. Ad-hoc imzada
+(`codesign -s -`) bu bağ imzanın özetidir (cdhash) ve her yeniden derlemede değişir:
+Sistem Ayarları'ndaki anahtar **açık görünmeye devam eder ama izin geçersizdir**.
+Klasik belirti: "izni verdim, uyarı hâlâ duruyor."
+
+Kalıcı çözüm — bir kez sabit, yerel bir imza kimliği oluştur:
 
 ```bash
-./build.sh --reset-perm
+./Scripts/setup-signing.sh
 ```
+
+Bu, giriş anahtarlığına kendinden imzalı bir kod imzalama sertifikası ekler ve
+`build.sh` bundan sonra onunla imzalar. İmza gereksinimi sertifikaya bağlandığı için
+(`identifier "app.temizlikvakti.mac" and certificate root = H"…"`) izin, yeniden
+derlemelerden etkilenmez.
+
+Kurulumdan sonra bir kez temizlik:
+
+```bash
+tccutil reset Accessibility app.temizlikvakti.mac   # eski geçersiz kayıtları sil
+```
+
+sonra izni yeniden ver. Kimliği kaldırmak istersen:
+`security delete-identity -c "Yerel Kod Imzasi"`
+
+Uygulama izni artık gerçek bir event tap denemesiyle sınıyor (yalnızca
+`AXIsProcessTrusted()` ile değil), izin verildiği anda uyarı kartı kendiliğinden
+kayboluyor ve kartta bir **Yeniden Başlat** düğmesi var.
 
 ## Kullanım
 
@@ -115,6 +140,7 @@ Sources/TemizlikVakti/
   Views/MenuPanelView.swift    Menü çubuğu paneli (Temizlik / Mola sekmeleri)
   Views/SettingsView.swift     Ayarlar penceresi
   Views/RenderPreview.swift    Ekranları PNG'ye çizen geliştirme yardımcısı
+Scripts/setup-signing.sh       Sabit yerel imza kimliği oluşturur (izin kalıcılığı için)
 ```
 
 ### Geliştirme

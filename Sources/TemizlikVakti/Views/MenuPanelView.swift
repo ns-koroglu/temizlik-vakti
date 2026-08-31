@@ -42,6 +42,10 @@ struct MenuPanelView: View {
         .padding(16)
         .frame(width: 300)
         .onAppear { permissionOK = Permissions.hasAccessibility }
+        // İzin verildiği anda uyarı kartı kendiliğinden kaybolsun
+        .onReceive(Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()) { _ in
+            if !permissionOK { permissionOK = Permissions.hasAccessibility }
+        }
     }
 
     // MARK: - Başlık
@@ -231,10 +235,14 @@ struct MenuPanelView: View {
                     permissionOK = Permissions.hasAccessibility
                 }
                 Button("Ayarları Aç") { Permissions.openAccessibilitySettings() }
-                Button("Yenile") { permissionOK = Permissions.hasAccessibility }
+                Button("Yeniden Başlat") { Permissions.relaunchApp() }
             }
             .font(.system(size: 11))
             .controlSize(.small)
+
+            Text("İzni verdiğin hâlde bu uyarı kalıyorsa uygulamayı yeniden başlat; macOS eski izin kaydını bazen ancak o zaman tazeler.")
+                .font(.system(size: 10))
+                .foregroundStyle(.secondary)
         }
         .padding(10)
         .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
