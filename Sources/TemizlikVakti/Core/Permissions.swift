@@ -4,15 +4,16 @@ import CoreGraphics
 
 enum Permissions {
 
-    /// Asıl gerçek: event tap kurabiliyor muyuz? AXIsProcessTrusted süreç içinde
-    /// önbelleğe alınabildiği ve eski/geçersiz TCC kayıtlarında yanıltabildiği için
-    /// izni doğrudan sınayarak ölçüyoruz (dinleme amaçlı, hiçbir olayı yutmayan tap).
-    static func canCreateEventTap() -> Bool {
+    /// Tanılama için: olayları yutabilen (defaultTap) bir tap kurulabiliyor mu?
+    /// Bu, kilidin ihtiyaç duyduğu iznin birebir karşılığıdır — dinleme amaçlı
+    /// (listenOnly) tap izin olmadan da kurulabildiği için o ölçüm yanıltıcıdır.
+    /// Kurulan tap anında kapatılır; sadece --check içinde çağrılır.
+    static func canCreateBlockingTap() -> Bool {
         let mask: CGEventMask = (1 << CGEventType.keyDown.rawValue)
         guard let tap = CGEvent.tapCreate(
             tap: .cghidEventTap,
             place: .headInsertEventTap,
-            options: .listenOnly,
+            options: .defaultTap,
             eventsOfInterest: mask,
             callback: { _, _, event, _ in Unmanaged.passUnretained(event) },
             userInfo: nil
@@ -28,13 +29,13 @@ enum Permissions {
         Paket: \(bundle)
         Kimlik: \(Bundle.main.bundleIdentifier ?? "-")
         AXIsProcessTrusted: \(AXIsProcessTrusted())
-        Event tap kurulabiliyor: \(canCreateEventTap())
+        Yutan (defaultTap) event tap kurulabiliyor: \(canCreateBlockingTap())
         """
     }
 
     /// Girişi kilitlemek için Erişilebilirlik (Accessibility) izni şart.
     static var hasAccessibility: Bool {
-        AXIsProcessTrusted() || canCreateEventTap()
+        AXIsProcessTrusted()
     }
 
     /// Sistem iznini ister; macOS kendi uyarı penceresini gösterir.
