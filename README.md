@@ -101,6 +101,19 @@ Kilit ekranındayken:
 
 **Koyu** (ekran tozunu gösterir) · **Açık** (parmak izi/kir için) · **Renkli** (gradyan)
 
+## Diller
+
+🇹🇷 Türkçe (varsayılan) · 🇬🇧 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français · 🇮🇹 Italiano · 🇵🇹 Português · 🇷🇺 Русский · 🇨🇳 简体中文 · 🇯🇵 日本語
+
+Uygulama açılışta **sistem diline** göre kendini ayarlar. Sistem dili bu on dilden
+biri değilse **Türkçe** kullanılır. Dili elle de seçebilirsin (menüdeki 🌐 düğmesi
+ya da Ayarlar → Genel → Dil); seçim kaydedilir ve anında uygulanır.
+
+Çeviriler `Sources/*/Localization/` altında, dil başına tek dosya. Metinler tek bir
+`struct` üzerinden tutulduğu için **eksik çeviri mümkün değil**: yeni bir metin
+eklendiğinde çeviri dosyaları derlenmez, tamamlanana kadar hata verir. Yeni bir dil
+eklemek için `AppLanguage`'a bir durum ve karşılık gelen dosyayı eklemek yeterli.
+
 ## Güvenlik
 
 Kilit süreç ömrüyle sınırlıdır:
@@ -131,7 +144,8 @@ Sources/TemizlikVakti/
   Core/SleepGuard.swift        Ekran uykusunu engelleyen IOKit assertion
   Core/Prefs.swift             Ayarlar (UserDefaults) + girişte başlatma
   Core/Sounds.swift            Sistem ses efektleri
-  Content/Snark.swift          Türkçe laf sokmalar ve mola ipuçları
+  Content/Snark.swift          Rastgele metin seçici
+  Localization/                10 dil, dil başına tek dosya (TVStrings)
   Views/LockScreenView.swift   Kilit ekranı
   Views/BreakScreenView.swift  Mola ekranı
   Views/MascotView.swift       SwiftUI ile çizilen sünger maskot (bakış + ruh hâlleri)
@@ -163,7 +177,9 @@ trackpad and mouse so you can physically clean your Mac without triggering anyth
 plus a 20-20-20 eye break reminder. It draws a full-screen shield over every display,
 swallows all input through a `CGEventTap`, and unlocks when you hold `esc` (or when the
 timer runs out). The mascot follows your trackpad movements even while input is frozen,
-and there are a few easter eggs hidden in there. Turkish UI. Requires Accessibility
+and there are a few easter eggs hidden in there. Available in 10 languages
+(Turkish, English, German, Spanish, French, Italian, Portuguese, Russian, Chinese,
+Japanese) — it follows your system language and falls back to Turkish. Requires Accessibility
 permission; the lock dies with the process, so a crash or quit always restores input.
 
 Build with `./build.sh --install --run` (needs Xcode or Command Line Tools, macOS 14+).

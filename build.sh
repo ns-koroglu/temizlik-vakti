@@ -75,6 +75,8 @@ if [ "$INSTALL" = "1" ]; then
   osascript -e 'quit app "Temizlik Vakti"' >/dev/null 2>&1 || true
   rm -rf "/Applications/$APP_NAME.app"
   cp -R "$APP" "/Applications/$APP_NAME.app"
+  # Yerel kopyayı bırakma: Spotlight/Launchpad'de aynı uygulamanın iki kaydı görünmesin
+  rm -rf "$OUT_DIR/$APP_NAME.app"
   APP="/Applications/$APP_NAME.app"
 fi
 

@@ -5,7 +5,10 @@ struct BreakScreenView: View {
     @EnvironmentObject var session: BreakSession
     @EnvironmentObject var prefs: Prefs
 
+    @EnvironmentObject var l10n: L10n
+
     private var theme: ShieldTheme { prefs.theme }
+    private var str: TVStrings { l10n.s }
 
     var body: some View {
         ZStack {
@@ -32,7 +35,7 @@ struct BreakScreenView: View {
 
             if session.phase == .finished {
                 VStack(spacing: 10) {
-                    Text("Mola bitti")
+                    Text(str.breakOver)
                         .font(.system(size: 46, weight: .bold, design: .rounded))
                     Text(session.tip)
                         .font(.system(size: 18, design: .rounded))
@@ -41,7 +44,7 @@ struct BreakScreenView: View {
                 .transition(.scale.combined(with: .opacity))
             } else {
                 VStack(spacing: 22) {
-                    Text("Göz Molası")
+                    Text(str.breakTitle)
                         .font(.system(size: 26, weight: .semibold, design: .rounded))
                         .opacity(0.75)
 
@@ -93,7 +96,7 @@ struct BreakScreenView: View {
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .padding(.horizontal, 9).padding(.vertical, 4)
                             .background(theme.fg.opacity(0.16), in: RoundedRectangle(cornerRadius: 6))
-                        Text(session.unlockProgress > 0.02 ? "Bırakma…" : "Molayı geçmek için basılı tut")
+                        Text(session.unlockProgress > 0.02 ? str.unlockHolding : str.breakStrictUnlock)
                             .font(.system(size: 15, weight: .medium, design: .rounded))
                     }
                     .frame(maxWidth: .infinity)
@@ -103,21 +106,21 @@ struct BreakScreenView: View {
                 .clipShape(Capsule())
                 .animation(.linear(duration: 0.05), value: session.unlockProgress)
 
-                Text("Katı mod açık · klavye ve trackpad kilitli")
+                Text(str.breakStrictHint)
                     .font(.system(size: 11, design: .rounded))
                     .opacity(0.45)
             }
         } else {
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
-                    Button("5 dk ertele") { session.snooze(minutes: 5) }
-                    Button("Molayı geç") { session.endBreak(completed: false) }
+                    Button(str.breakSnooze) { session.snooze(minutes: 5) }
+                    Button(str.breakSkip) { session.endBreak(completed: false) }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
                 .tint(theme.accent)
 
-                Text("esc tuşu da molayı geçer")
+                Text(str.breakEscHint)
                     .font(.system(size: 11, design: .rounded))
                     .opacity(0.45)
             }
@@ -129,7 +132,7 @@ struct BreakScreenView: View {
             Image(systemName: "eye")
                 .font(.system(size: 38))
                 .opacity(0.5)
-            Text("Göz Molası")
+            Text(str.breakTitle)
                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                 .opacity(0.7)
             Text("\(Int(ceil(session.remaining)))")

@@ -16,17 +16,20 @@ enum RenderPreview {
             b.configureForRender(remaining: 12, total: 20)
             content = AnyView(BreakScreenView(isPrimary: true)
                 .environmentObject(b)
-                .environmentObject(Prefs.shared))
+                .environmentObject(Prefs.shared)
+                .environmentObject(L10n.shared))
         case "party":
             session.configureForRender(elapsed: 42, unlock: 0, nudge: nil,
                                        egg: .party, eggMessage: "Hile kodu kabul edildi. Parti modu!")
             content = AnyView(LockScreenView(isPrimary: true)
                 .environmentObject(session)
-                .environmentObject(Prefs.shared))
+                .environmentObject(Prefs.shared)
+                .environmentObject(L10n.shared))
         default:
             content = AnyView(LockScreenView(isPrimary: true)
                 .environmentObject(session)
-                .environmentObject(Prefs.shared))
+                .environmentObject(Prefs.shared)
+                .environmentObject(L10n.shared))
         }
 
         let view = content.frame(width: size.width, height: size.height)

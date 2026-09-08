@@ -88,8 +88,8 @@ final class LockSession: ObservableObject {
         resetInteraction()
         phase = prefs.preroll > 0 ? .preroll : .running
         line = phase == .preroll
-            ? Snark.random(from: Snark.preroll, avoiding: nil)
-            : Snark.random(from: Snark.lines, avoiding: nil)
+            ? Snark.random(from: T.s.preroll, avoiding: nil)
+            : Snark.random(from: T.s.snark, avoiding: nil)
         lastSnark = Date()
 
         let locker = InputLocker.shared
@@ -104,7 +104,8 @@ final class LockSession: ObservableObject {
         shield.show { isPrimary in
             AnyView(LockScreenView(isPrimary: isPrimary)
                 .environmentObject(LockSession.shared)
-                .environmentObject(Prefs.shared))
+                .environmentObject(Prefs.shared)
+                .environmentObject(L10n.shared))
         }
 
         guard locker.start(unlockHold: holdSeconds) else {
@@ -139,13 +140,14 @@ final class LockSession: ObservableObject {
         unlockProgress = 0
         nudgeLine = nil
         phase = .running
-        line = Snark.random(from: Snark.lines, avoiding: nil)
+        line = Snark.random(from: T.s.snark, avoiding: nil)
         lastSnark = Date()
 
         shield.show(interactive: true) { isPrimary in
             AnyView(LockScreenView(isPrimary: isPrimary)
                 .environmentObject(LockSession.shared)
-                .environmentObject(Prefs.shared))
+                .environmentObject(Prefs.shared)
+                .environmentObject(L10n.shared))
         }
         NSApp.activate(ignoringOtherApps: true)
 
@@ -181,8 +183,8 @@ final class LockSession: ObservableObject {
         perfectRun = (pokeCount == 0 && elapsed > 15)
         clearEgg()
         line = perfectRun
-            ? "Kusursuz temizlik — hiç dokunmadın!"
-            : Snark.random(from: Snark.finished, avoiding: line)
+            ? T.s.perfectRun
+            : Snark.random(from: T.s.finished, avoiding: line)
         nudgeLine = nil
         Sounds.unlock()
 
@@ -226,7 +228,7 @@ final class LockSession: ObservableObject {
             prerollRemaining -= dt
             if prerollRemaining <= 0 {
                 phase = .running
-                line = Snark.random(from: Snark.lines, avoiding: nil)
+                line = Snark.random(from: T.s.snark, avoiding: nil)
                 lastSnark = now
             }
         case .running:
@@ -237,7 +239,7 @@ final class LockSession: ObservableObject {
             }
             if Prefs.shared.snark, now.timeIntervalSince(lastSnark) > 6.5 {
                 lastSnark = now
-                line = Snark.random(from: Snark.lines, avoiding: line)
+                line = Snark.random(from: T.s.snark, avoiding: line)
             }
         default:
             return
@@ -246,7 +248,7 @@ final class LockSession: ObservableObject {
         // Easter egg zamanlaması
         if let until = eggUntil, now >= until { clearEgg() }
         if egg == nil, phase == .running, now.timeIntervalSince(lastInputAt) > 45 {
-            setEgg(.sleepy, "Zzz… sen sil, ben kestireyim.", seconds: 0)
+            setEgg(.sleepy, T.s.eggSleepy, seconds: 0)
         }
 
         // ESC basılı tutma ile kilit açma
@@ -291,7 +293,7 @@ final class LockSession: ObservableObject {
         case .click, .scroll:
             poke()
         case .capsLock:
-            setEgg(.caps, "Bağırmana gerek yok, buradayım.", seconds: 2.5)
+            setEgg(.caps, T.s.eggCaps, seconds: 2.5)
         }
     }
 
@@ -309,7 +311,7 @@ final class LockSession: ObservableObject {
                 flipTimes.append(Date())
                 flipTimes.removeAll { Date().timeIntervalSince($0) > 2 }
                 if flipTimes.count >= 8, egg != .party {
-                    setEgg(.dizzy, "Tamam, başım döndü…", seconds: 3)
+                    setEgg(.dizzy, T.s.eggDizzy, seconds: 3)
                     flipTimes.removeAll()
                 }
             }
@@ -323,13 +325,13 @@ final class LockSession: ObservableObject {
         pokeTimes.removeAll { Date().timeIntervalSince($0) > 3 }
 
         if pokeTimes.count >= 15, egg != .party {
-            setEgg(.annoyed, "Tamam tamam! Anladım!", seconds: 3)
+            setEgg(.annoyed, T.s.eggAnnoyed, seconds: 3)
             pokeTimes.removeAll()
         }
 
         guard escapeStart == nil, egg == nil else { return }
         nudgeCount += 1
-        nudgeLine = Snark.random(from: Snark.blocked, avoiding: nudgeLine)
+        nudgeLine = Snark.random(from: T.s.blocked, avoiding: nudgeLine)
         Sounds.blocked()
 
         nudgeClearWork?.cancel()
@@ -344,7 +346,7 @@ final class LockSession: ObservableObject {
             keyHistory.removeAll()
             sparkleBurst += 1
             Sounds.unlock()
-            setEgg(.party, "Hile kodu kabul edildi. Parti modu!", seconds: 9)
+            setEgg(.party, T.s.eggParty, seconds: 9)
             return
         }
         if keyHistory.count >= Self.temiz.count,
@@ -352,7 +354,7 @@ final class LockSession: ObservableObject {
             keyHistory.removeAll()
             sparkleBurst += 1
             Sounds.tick()
-            setEgg(.secret, "Doğru kelime! Sünger seni sevdi.", seconds: 4)
+            setEgg(.secret, T.s.eggSecret, seconds: 4)
         }
     }
 
@@ -395,7 +397,7 @@ final class LockSession: ObservableObject {
         remaining = max(0, Double(duration) - elapsed)
         unlockProgress = unlock
         nudgeLine = nudge
-        line = Snark.lines[0]
+        line = T.s.snark.first ?? ""
         phase = .running
     }
 

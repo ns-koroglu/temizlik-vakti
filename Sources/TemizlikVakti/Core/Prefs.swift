@@ -4,18 +4,19 @@ import ServiceManagement
 enum ShieldTheme: String, CaseIterable, Identifiable {
     case dark, light, gradient
     var id: String { rawValue }
-    var title: String {
+    func title(_ s: TVStrings) -> String {
         switch self {
-        case .dark: return "Koyu (ekran tozu için)"
-        case .light: return "Açık (kir/leke için)"
-        case .gradient: return "Renkli"
+        case .dark: return s.themeDarkLong
+        case .light: return s.themeLightLong
+        case .gradient: return s.themeColorLong
         }
     }
-    var short: String {
+
+    func short(_ s: TVStrings) -> String {
         switch self {
-        case .dark: return "Koyu"
-        case .light: return "Açık"
-        case .gradient: return "Renkli"
+        case .dark: return s.themeDarkShort
+        case .light: return s.themeLightShort
+        case .gradient: return s.themeColorShort
         }
     }
 }
@@ -80,17 +81,29 @@ final class Prefs: ObservableObject {
         launchAtLogin = (SMAppService.mainApp.status == .enabled)
     }
 
-    static let workChoices: [(label: String, value: Int)] = [
-        ("10 dakika", 10), ("20 dakika", 20), ("30 dakika", 30),
-        ("45 dakika", 45), ("60 dakika", 60)
-    ]
+    // MARK: Seçenek listeleri (etiketler seçili dile göre üretilir)
 
-    static let breakChoices: [(label: String, value: Int)] = [
-        ("20 saniye", 20), ("30 saniye", 30), ("1 dakika", 60), ("2 dakika", 120)
-    ]
+    static func label(seconds: Int, _ s: TVStrings) -> String {
+        if seconds == 0 { return s.unlimited }
+        if seconds % 60 == 0 && seconds >= 60 {
+            return String(format: s.minutesChoice, seconds / 60)
+        }
+        return String(format: s.secondsChoice, seconds)
+    }
 
-    static let durationChoices: [(label: String, value: Int)] = [
-        ("30 saniye", 30), ("1 dakika", 60), ("2 dakika", 120),
-        ("5 dakika", 300), ("10 dakika", 600), ("Süresiz", 0)
-    ]
+    static let workValues = [10, 20, 30, 45, 60]          // dakika
+    static let breakValues = [20, 30, 60, 120]            // saniye
+    static let durationValues = [30, 60, 120, 300, 600, 0] // saniye, 0 = süresiz
+
+    static func workChoices(_ s: TVStrings) -> [(label: String, value: Int)] {
+        workValues.map { (String(format: s.minutesChoice, $0), $0) }
+    }
+
+    static func breakChoices(_ s: TVStrings) -> [(label: String, value: Int)] {
+        breakValues.map { (label(seconds: $0, s), $0) }
+    }
+
+    static func durationChoices(_ s: TVStrings) -> [(label: String, value: Int)] {
+        durationValues.map { (label(seconds: $0, s), $0) }
+    }
 }

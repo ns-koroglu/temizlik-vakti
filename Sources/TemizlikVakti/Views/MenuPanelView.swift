@@ -4,16 +4,19 @@ struct MenuPanelView: View {
     @EnvironmentObject var prefs: Prefs
     @EnvironmentObject var session: LockSession
     @EnvironmentObject var breaks: BreakSession
+    @EnvironmentObject var l10n: L10n
     @State private var permissionOK = Permissions.hasAccessibility
     @State private var tab = 0
+
+    private var s: TVStrings { l10n.s }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
 
             Picker("", selection: $tab) {
-                Text("Temizlik").tag(0)
-                Text("Mola").tag(1)
+                Text(s.tabCleaning).tag(0)
+                Text(s.tabBreak).tag(1)
             }
             .labelsHidden()
             .pickerStyle(.segmented)
@@ -24,16 +27,18 @@ struct MenuPanelView: View {
 
             Divider()
 
-            HStack {
+            HStack(spacing: 10) {
                 SettingsLink {
-                    Label("Ayarlar…", systemImage: "gearshape")
+                    Label(s.settings, systemImage: "gearshape")
                 }
                 .buttonStyle(.plain)
                 .font(.system(size: 12))
 
                 Spacer()
 
-                Button("Çıkış") { NSApp.terminate(nil) }
+                languageMenu
+
+                Button(s.quit) { NSApp.terminate(nil) }
                     .buttonStyle(.plain)
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
@@ -42,7 +47,6 @@ struct MenuPanelView: View {
         .padding(16)
         .frame(width: 300)
         .onAppear { permissionOK = Permissions.hasAccessibility }
-        // İzin verildiği anda uyarı kartı kendiliğinden kaybolsun
         .onReceive(Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()) { _ in
             if !permissionOK { permissionOK = Permissions.hasAccessibility }
         }
@@ -57,11 +61,33 @@ struct MenuPanelView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Temizlik Vakti")
                     .font(.system(size: 15, weight: .bold, design: .rounded))
-                Text("Mac'ini sil, tuşlara basma derdi yok.")
+                Text(s.tagline)
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
+                    .lineLimit(2)
             }
         }
+    }
+
+    private var languageMenu: some View {
+        Menu {
+            Picker("", selection: $l10n.selection) {
+                Text(String(format: s.systemLanguage, l10n.systemResolvedName))
+                    .tag(L10n.systemKey)
+                Divider()
+                ForEach(AppLanguage.allCases) { lang in
+                    Text("\(lang.flag)  \(lang.nativeName)").tag(lang.rawValue)
+                }
+            }
+            .labelsHidden()
+            .pickerStyle(.inline)
+        } label: {
+            Image(systemName: "globe")
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .frame(width: 26)
+        .help(s.language)
     }
 
     // MARK: - Temizlik sekmesi
@@ -69,22 +95,22 @@ struct MenuPanelView: View {
     @ViewBuilder
     private var cleaningTab: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Temizlik süresi")
+            Text(s.durationLabel)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
             Picker("", selection: $prefs.duration) {
-                ForEach(Prefs.durationChoices, id: \.value) { choice in
+                ForEach(Prefs.durationChoices(s), id: \.value) { choice in
                     Text(choice.label).tag(choice.value)
                 }
             }
             .labelsHidden()
             .pickerStyle(.menu)
 
-            Text("Ekran teması")
+            Text(s.themeLabel)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
             Picker("", selection: $prefs.theme) {
-                ForEach(ShieldTheme.allCases) { t in Text(t.short).tag(t) }
+                ForEach(ShieldTheme.allCases) { t in Text(t.short(s)).tag(t) }
             }
             .labelsHidden()
             .pickerStyle(.segmented)
@@ -93,7 +119,7 @@ struct MenuPanelView: View {
         Button(action: startCleaning) {
             HStack(spacing: 8) {
                 Image(systemName: "sparkles")
-                Text(session.isActive ? "Temizlik sürüyor…" : "Temizliğe Başla")
+                Text(session.isActive ? s.cleaningInProgress : s.startCleaning)
                     .fontWeight(.semibold)
             }
             .frame(maxWidth: .infinity)
@@ -109,14 +135,14 @@ struct MenuPanelView: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "eye")
-                Text("Önizle (kilitlemeden)")
+                Text(s.previewButton)
             }
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
         .disabled(session.isActive)
 
-        Text("Kilidi açmak için **esc** tuşunu \(String(format: "%.1f", prefs.unlockHold)) sn basılı tut.")
+        Text(.init(String(format: s.unlockHintMenu, String(format: "%.1f", prefs.unlockHold))))
             .font(.system(size: 11))
             .foregroundStyle(.secondary)
     }
@@ -126,7 +152,7 @@ struct MenuPanelView: View {
     @ViewBuilder
     private var breakTab: some View {
         Toggle(isOn: $prefs.breakEnabled) {
-            Text("Göz molası hatırlatıcısı")
+            Text(s.breakToggle)
                 .font(.system(size: 13, weight: .medium))
         }
         .toggleStyle(.switch)
@@ -136,19 +162,19 @@ struct MenuPanelView: View {
 
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Çalışma").font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
+                Text(s.breakWork).font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
                 Spacer()
                 Picker("", selection: $prefs.workMinutes) {
-                    ForEach(Prefs.workChoices, id: \.value) { c in Text(c.label).tag(c.value) }
+                    ForEach(Prefs.workChoices(s), id: \.value) { c in Text(c.label).tag(c.value) }
                 }
                 .labelsHidden().pickerStyle(.menu).frame(width: 130)
                 .onChange(of: prefs.workMinutes) { _, _ in breaks.rescheduleNext() }
             }
             HStack {
-                Text("Mola").font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
+                Text(s.breakLength).font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
                 Spacer()
                 Picker("", selection: $prefs.breakSeconds) {
-                    ForEach(Prefs.breakChoices, id: \.value) { c in Text(c.label).tag(c.value) }
+                    ForEach(Prefs.breakChoices(s), id: \.value) { c in Text(c.label).tag(c.value) }
                 }
                 .labelsHidden().pickerStyle(.menu).frame(width: 130)
             }
@@ -156,8 +182,7 @@ struct MenuPanelView: View {
         .disabled(!prefs.breakEnabled)
 
         Toggle(isOn: $prefs.breakStrict) {
-            Text("Katı mod — molada girişi kilitle")
-                .font(.system(size: 12))
+            Text(s.breakStrictMode).font(.system(size: 12))
         }
         .toggleStyle(.checkbox)
         .disabled(!prefs.breakEnabled || !permissionOK)
@@ -167,22 +192,21 @@ struct MenuPanelView: View {
                 MenuBarPanel.dismiss()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { breaks.startBreak() }
             } label: {
-                Label("Şimdi mola", systemImage: "eye")
-                    .frame(maxWidth: .infinity)
+                Label(s.breakNow, systemImage: "eye").frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
             .disabled(breaks.isResting || session.isActive)
 
             if breaks.isPaused {
-                Button("Devam") { breaks.resume() }
+                Button(s.breakResume) { breaks.resume() }
             } else {
-                Button("1 sa duraklat") { breaks.pause(hours: 1) }
+                Button(s.breakPauseHour) { breaks.pause(hours: 1) }
                     .disabled(!prefs.breakEnabled)
             }
         }
         .controlSize(.regular)
 
-        Text("20-20-20: her 20 dakikada bir, 20 saniye boyunca ~6 metre uzağa bak.")
+        Text(s.breakRuleNote)
             .font(.system(size: 11))
             .foregroundStyle(.secondary)
     }
@@ -209,38 +233,38 @@ struct MenuPanelView: View {
     }
 
     private var statusText: String {
-        if !prefs.breakEnabled { return "Hatırlatıcı kapalı" }
+        if !prefs.breakEnabled { return s.breakDisabled }
         if breaks.isPaused, let until = breaks.pausedUntil {
-            return "Duraklatıldı — \(BreakSession.countdown(until.timeIntervalSinceNow)) kaldı"
+            return String(format: s.breakPaused, BreakSession.countdown(until.timeIntervalSinceNow))
         }
-        if let s = breaks.secondsUntilNextBreak {
-            return "Sonraki mola: \(BreakSession.countdown(s))"
+        if let seconds = breaks.secondsUntilNextBreak {
+            return String(format: s.breakNext, BreakSession.countdown(seconds))
         }
-        return "Planlanıyor…"
+        return s.breakScheduling
     }
 
     // MARK: - İzin kartı
 
     private var permissionCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Erişilebilirlik izni gerekli", systemImage: "exclamationmark.triangle.fill")
+            Label(s.permissionTitle, systemImage: "exclamationmark.triangle.fill")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.orange)
-            Text("Klavye ve trackpad'i kilitleyebilmek için Sistem Ayarları → Gizlilik ve Güvenlik → Erişilebilirlik listesinde Temizlik Vakti'ne izin ver.")
+            Text(s.permissionBody)
                 .font(.system(size: 11))
                 .foregroundStyle(.secondary)
             HStack {
-                Button("İzin İste") {
+                Button(s.permissionRequest) {
                     Permissions.requestAccessibility()
                     permissionOK = Permissions.hasAccessibility
                 }
-                Button("Ayarları Aç") { Permissions.openAccessibilitySettings() }
-                Button("Yeniden Başlat") { Permissions.relaunchApp() }
+                Button(s.permissionOpenSettings) { Permissions.openAccessibilitySettings() }
+                Button(s.permissionRelaunch) { Permissions.relaunchApp() }
             }
             .font(.system(size: 11))
             .controlSize(.small)
 
-            Text("İzni verdiğin hâlde bu uyarı kalıyorsa uygulamayı yeniden başlat; macOS eski izin kaydını bazen ancak o zaman tazeler.")
+            Text(s.permissionStaleNote)
                 .font(.system(size: 10))
                 .foregroundStyle(.secondary)
         }

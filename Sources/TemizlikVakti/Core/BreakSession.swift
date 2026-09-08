@@ -116,13 +116,14 @@ final class BreakSession: ObservableObject {
         remaining = totalSeconds
         unlockProgress = 0
         escapeStart = nil
-        tip = Snark.random(from: Snark.breakTips, avoiding: nil)
+        tip = Snark.random(from: T.s.breakTips, avoiding: nil)
         phase = .resting
 
         shield.show(interactive: !isStrict) { isPrimary in
             AnyView(BreakScreenView(isPrimary: isPrimary)
                 .environmentObject(BreakSession.shared)
-                .environmentObject(Prefs.shared))
+                .environmentObject(Prefs.shared)
+                .environmentObject(L10n.shared))
         }
 
         if isStrict {
@@ -187,7 +188,7 @@ final class BreakSession: ObservableObject {
 
         if completed {
             phase = .finished
-            tip = Snark.random(from: Snark.breakDone, avoiding: tip)
+            tip = Snark.random(from: T.s.breakDone, avoiding: tip)
             Sounds.unlock()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { [weak self] in
                 guard let self, self.phase == .finished else { return }
@@ -217,7 +218,7 @@ final class BreakSession: ObservableObject {
     func configureForRender(remaining: Double, total: Double) {
         totalSeconds = total
         self.remaining = remaining
-        tip = Snark.breakTips[0]
+        tip = T.s.breakTips.first ?? ""
         phase = .resting
     }
 

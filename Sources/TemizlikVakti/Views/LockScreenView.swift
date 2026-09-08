@@ -33,9 +33,11 @@ struct LockScreenView: View {
     @EnvironmentObject var session: LockSession
     @EnvironmentObject var prefs: Prefs
 
+    @EnvironmentObject var l10n: L10n
     @State private var showBurst = false
 
     private var theme: ShieldTheme { prefs.theme }
+    private var str: TVStrings { l10n.s }
 
     var body: some View {
         ZStack {
@@ -141,7 +143,7 @@ struct LockScreenView: View {
                 }
                 .frame(width: 300, height: 8)
             } else {
-                Text("Süresiz oturum")
+                Text(str.unlimitedSession)
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .opacity(0.6)
             }
@@ -176,19 +178,19 @@ struct LockScreenView: View {
     @ViewBuilder
     private var finishedBlock: some View {
         VStack(spacing: 12) {
-            Text("Tertemiz!")
+            Text(str.allClean)
                 .font(.system(size: 56, weight: .bold, design: .rounded))
             Text(session.line)
                 .font(.system(size: 19, design: .rounded))
                 .opacity(0.85)
             if session.perfectRun {
-                Label("Kusursuz tur — hiç tuşa dokunmadın", systemImage: "rosette")
+                Label(str.perfectRun, systemImage: "rosette")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .padding(.horizontal, 12).padding(.vertical, 6)
                     .background(theme.accent.opacity(0.25), in: Capsule())
             }
             if session.elapsed > 1 {
-                Text("Temizlik süresi: \(LockSession.clock(session.elapsed)) · engellenen girdi: \(session.pokeCount)")
+                Text(String(format: str.sessionSummary, LockSession.clock(session.elapsed), session.pokeCount))
                     .font(.system(size: 13, design: .rounded))
                     .opacity(0.6)
             }
@@ -210,7 +212,7 @@ struct LockScreenView: View {
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
                         .padding(.horizontal, 9).padding(.vertical, 4)
                         .background(theme.fg.opacity(0.16), in: RoundedRectangle(cornerRadius: 6))
-                    Text(session.unlockProgress > 0.02 ? "Bırakma…" : "Kilidi açmak için basılı tut")
+                    Text(session.unlockProgress > 0.02 ? str.unlockHolding : str.unlockHold)
                         .font(.system(size: 15, weight: .medium, design: .rounded))
                 }
                 .frame(maxWidth: .infinity)
@@ -220,7 +222,7 @@ struct LockScreenView: View {
             .clipShape(Capsule())
             .animation(.linear(duration: 0.05), value: session.unlockProgress)
 
-            Text("Klavye ve trackpad kilitli · Uygulama kapanırsa kilit otomatik açılır")
+            Text(str.lockFooterNote)
                 .font(.system(size: 11, design: .rounded))
                 .opacity(0.45)
         }
