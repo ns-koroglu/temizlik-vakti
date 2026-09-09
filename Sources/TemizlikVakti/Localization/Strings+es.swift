@@ -32,6 +32,7 @@ extension TVStrings {
 
         unlockHold: "Mantén para desbloquear", unlockHolding: "No sueltes…",
         lockFooterNote: "Teclado y trackpad bloqueados · Si la app se cierra, la entrada vuelve al instante",
+        previewFooterNote: "VISTA PREVIA · La entrada NO está bloqueada · Pulsa una tecla o haz clic para salir",
         unlimitedSession: "Sesión sin límite",
         allClean: "¡Impecable!",
         perfectRun: "Ronda perfecta: no tocaste ni una tecla",

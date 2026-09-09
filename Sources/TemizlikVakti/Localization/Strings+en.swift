@@ -41,6 +41,7 @@ extension TVStrings {
         unlockHold: "Hold to unlock",
         unlockHolding: "Keep holding…",
         lockFooterNote: "Keyboard and trackpad locked · Input returns instantly if the app quits",
+        previewFooterNote: "PREVIEW · Input is NOT locked · Press any key or click to exit",
         unlimitedSession: "Open-ended session",
         allClean: "Spotless!",
         perfectRun: "Perfect run — you never touched a key",

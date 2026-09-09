@@ -32,6 +32,7 @@ extension TVStrings {
 
         unlockHold: "Tieni premuto per sbloccare", unlockHolding: "Non mollare…",
         lockFooterNote: "Tastiera e trackpad bloccati · Se l'app si chiude, l'input torna subito",
+        previewFooterNote: "ANTEPRIMA · L'input NON è bloccato · Premi un tasto o fai clic per uscire",
         unlimitedSession: "Sessione senza limite",
         allClean: "Splendente!",
         perfectRun: "Giro perfetto: non hai toccato un tasto",

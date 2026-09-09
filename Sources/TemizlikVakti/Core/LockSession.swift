@@ -52,6 +52,7 @@ final class LockSession: ObservableObject {
     private var lastMoveSign: Double = 0
     private var lastInputAt = Date()
     private var eggUntil: Date?
+    private var lastBlockedSound = Date.distantPast
 
     private static let konami: [Int64] = [126, 126, 125, 125, 123, 124, 123, 124, 11, 0]
     private static let temiz: [Int64] = [17, 14, 46, 34, 6]   // t e m i z
@@ -213,6 +214,8 @@ final class LockSession: ObservableObject {
     }
 
     private func releaseInput() {
+        // Easter egg için tutulan ham tuş kodlarını oturum bitince bellekte bırakma.
+        keyHistory.removeAll()
         timer?.invalidate(); timer = nil
         InputLocker.shared.stop(owner: "lock")
         InputLocker.shared.onEscapeChanged = nil
@@ -340,7 +343,11 @@ final class LockSession: ObservableObject {
         guard escapeStart == nil, egg == nil else { return }
         nudgeCount += 1
         nudgeLine = Snark.random(from: T.s.blocked, avoiding: nudgeLine)
-        Sounds.blocked()
+        // Ses yalnızca saniyede bir: ard arda basışta üst üste binmesin.
+        if Date().timeIntervalSince(lastBlockedSound) > 1.0 {
+            lastBlockedSound = Date()
+            Sounds.blocked()
+        }
 
         nudgeClearWork?.cancel()
         let work = DispatchWorkItem { [weak self] in self?.nudgeLine = nil }

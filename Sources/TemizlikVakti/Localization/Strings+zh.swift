@@ -32,6 +32,7 @@ extension TVStrings {
 
         unlockHold: "长按解锁", unlockHolding: "别松手…",
         lockFooterNote: "键盘和触控板已锁定 · App 一旦退出，输入立即恢复",
+        previewFooterNote: "预览 · 输入并未锁定 · 按任意键或点击退出",
         unlimitedSession: "不限时会话",
         allClean: "干干净净！",
         perfectRun: "完美一轮 —— 一个键都没碰",

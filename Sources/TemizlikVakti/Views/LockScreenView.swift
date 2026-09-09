@@ -222,9 +222,12 @@ struct LockScreenView: View {
             .clipShape(Capsule())
             .animation(.linear(duration: 0.05), value: session.unlockProgress)
 
-            Text(str.lockFooterNote)
-                .font(.system(size: 11, design: .rounded))
-                .opacity(0.45)
+            // Önizlemede giriş kilitli DEĞİL; "kilitli" demek kullanıcıyı
+            // gerçekten silmeye başlaması için yanlış yönlendiriyordu.
+            Text(session.isPreview ? str.previewFooterNote : str.lockFooterNote)
+                .font(.system(size: 11, weight: session.isPreview ? .semibold : .regular, design: .rounded))
+                .opacity(session.isPreview ? 0.8 : 0.45)
+                .multilineTextAlignment(.center)
         }
     }
 
@@ -244,6 +247,13 @@ struct LockScreenView: View {
                 .font(.system(size: 34, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .opacity(0.55)
+
+            // Kaçış yolu her ekranda görünmeli: kullanıcı ikincil ekrana bakıyor olabilir.
+            Text(session.isPreview ? str.previewFooterNote : str.unlockHold)
+                .font(.system(size: 12, design: .rounded))
+                .multilineTextAlignment(.center)
+                .opacity(0.45)
+                .padding(.horizontal, 30)
         }
     }
 

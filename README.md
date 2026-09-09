@@ -126,6 +126,17 @@ Kilit süreç ömrüyle sınırlıdır:
 
 Uygulama hiçbir veriyi okumaz, yazmaz veya ağa göndermez.
 
+## Kaldırma
+
+```bash
+# 1) Önce "Girişte başlat" kapatılmalı (Ayarlar → Genel), yoksa hayalet giriş öğesi kalır
+osascript -e 'quit app "Temizlik Vakti"'
+rm -rf "/Applications/Temizlik Vakti.app"
+tccutil reset Accessibility app.temizlikvakti.mac    # Erişilebilirlik kaydını sil
+defaults delete app.temizlikvakti.mac                # ayarları sil
+security delete-identity -c "Yerel Kod Imzasi"       # imza kimliğini de silmek istersen
+```
+
 ## Proje yapısı
 
 ```

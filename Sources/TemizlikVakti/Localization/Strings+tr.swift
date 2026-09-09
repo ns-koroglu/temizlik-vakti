@@ -41,6 +41,7 @@ extension TVStrings {
         unlockHold: "Kilidi açmak için basılı tut",
         unlockHolding: "Bırakma…",
         lockFooterNote: "Klavye ve trackpad kilitli · Uygulama kapanırsa kilit otomatik açılır",
+        previewFooterNote: "ÖNİZLEME · Giriş kilitli DEĞİL · Çıkmak için herhangi bir tuşa bas veya tıkla",
         unlimitedSession: "Süresiz oturum",
         allClean: "Tertemiz!",
         perfectRun: "Kusursuz tur — hiç tuşa dokunmadın",

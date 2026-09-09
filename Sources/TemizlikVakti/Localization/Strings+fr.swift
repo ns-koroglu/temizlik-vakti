@@ -32,6 +32,7 @@ extension TVStrings {
 
         unlockHold: "Maintiens pour déverrouiller", unlockHolding: "Continue…",
         lockFooterNote: "Clavier et trackpad verrouillés · Si l'app se ferme, la saisie revient aussitôt",
+        previewFooterNote: "APERÇU · La saisie n'est PAS verrouillée · Appuie sur une touche ou clique pour sortir",
         unlimitedSession: "Session sans limite",
         allClean: "Impeccable !",
         perfectRun: "Parcours parfait — aucune touche effleurée",

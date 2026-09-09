@@ -32,6 +32,7 @@ extension TVStrings {
 
         unlockHold: "Zum Entsperren halten", unlockHolding: "Weiter halten…",
         lockFooterNote: "Tastatur und Trackpad gesperrt · Beim Beenden der App kommt die Eingabe sofort zurück",
+        previewFooterNote: "VORSCHAU · Eingabe ist NICHT gesperrt · Beliebige Taste oder Klick zum Beenden",
         unlimitedSession: "Sitzung ohne Zeitlimit",
         allClean: "Blitzblank!",
         perfectRun: "Perfekter Durchgang — keine einzige Taste berührt",

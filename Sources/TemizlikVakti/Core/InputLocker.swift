@@ -55,6 +55,7 @@ final class InputLocker {
 
     private var escapeDown = false
     private var lastMouseSignal = Date.distantPast
+    private var lastScrollSignal = Date.distantPast
     private var pendingDX: Double = 0
     private var pendingDY: Double = 0
     private var escapeSince: Date?
@@ -72,8 +73,11 @@ final class InputLocker {
         self.failsafeFired = false
         self.unlockHold = max(0.5, unlockHold)
 
-        var mask: CGEventMask = 0
-        for bit in 1...33 { mask |= (1 << UInt64(bit)) }
+        // Tüm olay türlerini yut. Elle 1...33 yazmak bugünün pressure/directTouch
+        // olaylarını ve ileride eklenecek türleri dışarıda bırakıyordu; kilidin
+        // iddiası "hiçbir girdi geçmez" olduğu için maske eksiksiz olmalı.
+        // (0 = null olayı hariç; tapDisabled bildirimleri maskeden bağımsız gelir.)
+        let mask: CGEventMask = ~CGEventMask(1)
 
         let refcon = Unmanaged.passUnretained(self).toOpaque()
         guard let tap = CGEvent.tapCreate(
@@ -200,6 +204,11 @@ final class InputLocker {
         case .leftMouseDown, .rightMouseDown, .otherMouseDown:
             signal = InputSignal(kind: .click)
         case .scrollWheel:
+            // Trackpad kaydırması saniyede yüzlerce olay üretiyor; her biri ana
+            // kuyruğa atlayıp ses çalıyordu.
+            let now = Date()
+            guard now.timeIntervalSince(lastScrollSignal) > 0.3 else { return }
+            lastScrollSignal = now
             signal = InputSignal(kind: .scroll)
         case .mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged:
             pendingDX += Double(event.getIntegerValueField(.mouseEventDeltaX))

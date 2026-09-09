@@ -12,7 +12,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if args.contains("--check") {
             let text = Permissions.diagnostics()
             print(text)
-            try? text.write(toFile: "/tmp/tv-check.txt", atomically: true, encoding: .utf8)
+            // Dünya-yazılır /tmp yerine kullanıcıya özel geçici dizin (sembolik bağ
+            // ile dosya ezme riski ve dünya-okunur donanım dökümü olmasın).
+            let path = NSTemporaryDirectory() + "tv-check.txt"
+            try? text.write(toFile: path, atomically: true, encoding: .utf8)
+            print("yazıldı: \(path)")
             NSApp.terminate(nil)
             return
         }

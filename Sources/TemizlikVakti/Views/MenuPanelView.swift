@@ -50,6 +50,9 @@ struct MenuPanelView: View {
         .frame(width: 300)
         .onAppear { permissionOK = Permissions.hasAccessibility }
         .onReceive(permissionTicker) { _ in
+            // Yalnızca izin eksikken yokla; verildikten sonra sürekli sorgulamanın
+            // bir faydası yok (panel gizliyken de tetikleniyor).
+            guard !permissionOK else { return }
             permissionOK = Permissions.hasAccessibility
         }
     }
@@ -58,7 +61,7 @@ struct MenuPanelView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            MascotView(mood: .ready, size: 44, liveMouse: true)
+            MascotView(mood: .ready, size: 44, animated: false)
                 .frame(width: 58, height: 52)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Temizlik Vakti")

@@ -32,6 +32,7 @@ extension TVStrings {
 
         unlockHold: "長押しで解除", unlockHolding: "そのまま…",
         lockFooterNote: "キーボードとトラックパッドをロック中 · アプリが終了すれば入力はすぐ戻ります",
+        previewFooterNote: "プレビュー · 入力はロックされていません · 任意のキーまたはクリックで終了",
         unlimitedSession: "時間無制限のセッション",
         allClean: "ピカピカ！",
         perfectRun: "完璧 — キーに一度も触れませんでした",

@@ -49,6 +49,7 @@ struct TVStrings: Sendable {
     let unlockHold: String
     let unlockHolding: String
     let lockFooterNote: String
+    let previewFooterNote: String
     let unlimitedSession: String
     let allClean: String
     let perfectRun: String

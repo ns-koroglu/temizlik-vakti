@@ -14,10 +14,14 @@ struct MascotView: View {
     var gaze: CGVector = .zero
     /// true ise gerçek imleç konumunu kendi okur (kilitli olmayan ekranlar için).
     var liveMouse: Bool = false
+    /// false ise tek kare çizilir. Menü çubuğu paneli gizlendiğinde SwiftUI
+    /// TimelineView'ı durdurmuyor: maskot arka planda 30 fps çizilmeye devam edip
+    /// boştaki uygulamayı %10-20 CPU'da tutuyordu (ölçüldü).
+    var animated: Bool = true
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { ctx in
-            let t = ctx.date.timeIntervalSinceReferenceDate
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !animated)) { ctx in
+            let t = animated ? ctx.date.timeIntervalSinceReferenceDate : 0
             let look = liveMouse ? Self.mouseGaze() : gaze
             let party = (mood == .party)
             let bobSpeed = party ? 5.5 : 1.7

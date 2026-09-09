@@ -40,9 +40,12 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 3650 \
 openssl pkcs12 -export -inkey "$TMP/key.pem" -in "$TMP/cert.pem" \
   -out "$TMP/id.p12" -passout pass:local -name "$CN" >/dev/null 2>&1
 
-# -T /usr/bin/codesign -A : imzalama sırasında anahtar erişimi için pencere çıkmasın
+# -T /usr/bin/codesign: anahtara yalnızca codesign erişebilsin.
+# (-A bayrağı kullanılmıyor: o, özel anahtarı "her uygulama sorusuz erişebilir"
+#  ACL'iyle saklardı — Erişilebilirlik izinli bir uygulamayı imzalayan anahtar için
+#  gereğinden geniş bir yetki.)
 security import "$TMP/id.p12" -k "$HOME/Library/Keychains/login.keychain-db" \
-  -P local -T /usr/bin/codesign -A >/dev/null
+  -P local -T /usr/bin/codesign >/dev/null
 
 echo "✓ '$CN' kimliği oluşturuldu ve giriş anahtarlığına eklendi."
 echo "  Kaldırmak için: security delete-identity -c \"$CN\""
