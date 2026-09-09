@@ -31,7 +31,7 @@ struct SettingsView: View {
                     Text(String(format: s.settingsPreroll, prefs.preroll))
                 }
                 VStack(alignment: .leading) {
-                    Text(String(format: s.settingsUnlockHold, String(format: "%.1f", prefs.unlockHold)))
+                    Text(String(format: s.settingsUnlockHold, l10n.number(prefs.unlockHold)))
                     Slider(value: $prefs.unlockHold, in: 0.5...5.0, step: 0.5)
                 }
             }

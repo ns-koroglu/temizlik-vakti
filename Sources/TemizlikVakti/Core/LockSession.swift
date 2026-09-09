@@ -67,6 +67,8 @@ final class LockSession: ObservableObject {
 
     func start() {
         guard phase == .idle else { return }
+        // Mola ekranı açıkken ikinci bir kalkan açma.
+        guard !BreakSession.shared.isResting else { return }
         let prefs = Prefs.shared
         Sounds.enabled = prefs.sounds
 
@@ -108,7 +110,7 @@ final class LockSession: ObservableObject {
                 .environmentObject(L10n.shared))
         }
 
-        guard locker.start(unlockHold: holdSeconds) else {
+        guard locker.start(owner: "lock", unlockHold: holdSeconds) else {
             shield.hide()
             phase = .idle
             needsPermission = true
@@ -130,7 +132,8 @@ final class LockSession: ObservableObject {
 
     /// Girişi kilitlemeden yalnızca kalkan ekranını gösterir (tema/maskot denemek için).
     func startPreview() {
-        guard phase == .idle else { return }
+        guard phase == .idle, !isPreview else { return }
+        guard !BreakSession.shared.isResting else { return }
         let prefs = Prefs.shared
         Sounds.enabled = prefs.sounds
         isPreview = true
@@ -139,6 +142,7 @@ final class LockSession: ObservableObject {
         remaining = Double(duration)
         unlockProgress = 0
         nudgeLine = nil
+        resetInteraction()
         phase = .running
         line = Snark.random(from: T.s.snark, avoiding: nil)
         lastSnark = Date()
@@ -177,6 +181,9 @@ final class LockSession: ObservableObject {
     /// Kilidi açar ve kısa bir "bitti" ekranı gösterir.
     func finish(auto: Bool = false) {
         guard phase == .preroll || phase == .running else { return }
+        // Önizlemede kilit yok; süre dolduğunda önizlemeyi kapat.
+        // (Eskiden finish() çalışıyor, isPreview true kalıyor ve olay izleyicisi sızıyordu.)
+        if isPreview { endPreview(); return }
         releaseInput()
         phase = .finished
         unlockProgress = 0
@@ -207,7 +214,7 @@ final class LockSession: ObservableObject {
 
     private func releaseInput() {
         timer?.invalidate(); timer = nil
-        InputLocker.shared.stop()
+        InputLocker.shared.stop(owner: "lock")
         InputLocker.shared.onEscapeChanged = nil
         InputLocker.shared.onSignal = nil
         InputLocker.shared.onFailsafeUnlock = nil
@@ -220,7 +227,8 @@ final class LockSession: ObservableObject {
 
     private func tick() {
         let now = Date()
-        let dt = now.timeIntervalSince(lastTick)
+        // Uykudan dönüşte duvar saati sıçrar; tek karede oturumu bitirmesin.
+        let dt = min(now.timeIntervalSince(lastTick), 1.0)
         lastTick = now
 
         switch phase {
@@ -247,7 +255,7 @@ final class LockSession: ObservableObject {
 
         // Easter egg zamanlaması
         if let until = eggUntil, now >= until { clearEgg() }
-        if egg == nil, phase == .running, now.timeIntervalSince(lastInputAt) > 45 {
+        if egg == nil, phase == .running, !isPreview, now.timeIntervalSince(lastInputAt) > 45 {
             setEgg(.sleepy, T.s.eggSleepy, seconds: 0)
         }
 

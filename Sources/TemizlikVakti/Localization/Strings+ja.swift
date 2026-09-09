@@ -10,8 +10,12 @@ extension TVStrings {
         unlockHintMenu: "**esc** を %@ 秒長押しで解除。",
         settings: "設定…", quit: "終了",
         language: "言語", systemLanguage: "システムの言語（%@）",
-
-        secondsChoice: "%d 秒", minutesChoice: "%d 分", unlimited: "無制限",
+        secondsChoice: "%d 秒",
+        secondsChoiceOne: "1 秒",
+        minutesChoice: "%d 分",
+        minutesChoiceOne: "1 分",
+        unlimited: "無制限",
+        countdownHoursMinutes: "%d 時間 %02d 分",
 
         themeDarkShort: "ダーク", themeLightShort: "ライト", themeColorShort: "カラー",
         themeDarkLong: "ダーク（ホコリが一番見える）",

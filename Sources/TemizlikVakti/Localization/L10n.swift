@@ -36,6 +36,16 @@ final class L10n: ObservableObject {
     }
 
     var systemResolvedName: String { AppLanguage.fromSystem().nativeName }
+
+    /// Ondalık ayırıcı dile göre değişir (tr/de/fr: "2,5" — en: "2.5").
+    func number(_ value: Double, digits: Int = 1) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: current.rawValue)
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = digits
+        formatter.maximumFractionDigits = digits
+        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.\(digits)f", value)
+    }
 }
 
 /// Kısa erişim

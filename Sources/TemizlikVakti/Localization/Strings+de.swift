@@ -10,8 +10,12 @@ extension TVStrings {
         unlockHintMenu: "Zum Entsperren **esc** %@ s gedrückt halten.",
         settings: "Einstellungen…", quit: "Beenden",
         language: "Sprache", systemLanguage: "Systemsprache (%@)",
-
-        secondsChoice: "%d Sekunden", minutesChoice: "%d Minuten", unlimited: "Ohne Limit",
+        secondsChoice: "%d Sekunden",
+        secondsChoiceOne: "1 Sekunde",
+        minutesChoice: "%d Minuten",
+        minutesChoiceOne: "1 Minute",
+        unlimited: "Ohne Limit",
+        countdownHoursMinutes: "%d Std %02d Min",
 
         themeDarkShort: "Dunkel", themeLightShort: "Hell", themeColorShort: "Farbig",
         themeDarkLong: "Dunkel (zeigt Staub am besten)",

@@ -86,9 +86,10 @@ final class Prefs: ObservableObject {
     static func label(seconds: Int, _ s: TVStrings) -> String {
         if seconds == 0 { return s.unlimited }
         if seconds % 60 == 0 && seconds >= 60 {
-            return String(format: s.minutesChoice, seconds / 60)
+            let minutes = seconds / 60
+            return minutes == 1 ? s.minutesChoiceOne : String(format: s.minutesChoice, minutes)
         }
-        return String(format: s.secondsChoice, seconds)
+        return seconds == 1 ? s.secondsChoiceOne : String(format: s.secondsChoice, seconds)
     }
 
     static let workValues = [10, 20, 30, 45, 60]          // dakika
@@ -96,7 +97,7 @@ final class Prefs: ObservableObject {
     static let durationValues = [30, 60, 120, 300, 600, 0] // saniye, 0 = süresiz
 
     static func workChoices(_ s: TVStrings) -> [(label: String, value: Int)] {
-        workValues.map { (String(format: s.minutesChoice, $0), $0) }
+        workValues.map { ($0 == 1 ? s.minutesChoiceOne : String(format: s.minutesChoice, $0), $0) }
     }
 
     static func breakChoices(_ s: TVStrings) -> [(label: String, value: Int)] {

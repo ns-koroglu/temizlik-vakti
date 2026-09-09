@@ -10,8 +10,12 @@ extension TVStrings {
         unlockHintMenu: "Maintiens **esc** %@ s pour déverrouiller.",
         settings: "Réglages…", quit: "Quitter",
         language: "Langue", systemLanguage: "Langue du système (%@)",
-
-        secondsChoice: "%d secondes", minutesChoice: "%d minutes", unlimited: "Sans limite",
+        secondsChoice: "%d secondes",
+        secondsChoiceOne: "1 seconde",
+        minutesChoice: "%d minutes",
+        minutesChoiceOne: "1 minute",
+        unlimited: "Sans limite",
+        countdownHoursMinutes: "%d h %02d min",
 
         themeDarkShort: "Sombre", themeLightShort: "Clair", themeColorShort: "Couleur",
         themeDarkLong: "Sombre (révèle la poussière)",

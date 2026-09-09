@@ -28,12 +28,23 @@ final class InputLocker {
     static let shared = InputLocker()
     private init() {}
 
-    private var tap: CFMachPort?
+    private var _tap: CFMachPort?
+    /// Tap iki iş parçacığından erişiliyor (ana kuyruk kurar/yıkar, tap iş parçacığı
+    /// yeniden etkinleştirir). Kilitli erişim + yerel güçlü referans, serbest
+    /// bırakılmış CFMachPort kullanımını engelliyor.
+    private var tap: CFMachPort? {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _tap }
+        set { stateLock.lock(); _tap = newValue; stateLock.unlock() }
+    }
+    private let stateLock = NSLock()
     private var source: CFRunLoopSource?
     private var thread: Thread?
     private var loop: CFRunLoop?
 
     private(set) var isRunning = false
+    /// Kilidi kim kurdu ("lock" ya da "break") — iki oturum birbirinin kilidini sökmesin.
+    private(set) var owner: String?
+    private var failsafeFired = false
 
     /// ESC basılı tutma durumu değiştiğinde ana kuyrukta çağrılır.
     var onEscapeChanged: ((Bool) -> Void)?
@@ -46,7 +57,6 @@ final class InputLocker {
     private var lastMouseSignal = Date.distantPast
     private var pendingDX: Double = 0
     private var pendingDY: Double = 0
-    private let stateLock = NSLock()
     private var escapeSince: Date?
     private var unlockHold: Double = 2.0
 
@@ -55,8 +65,11 @@ final class InputLocker {
     // MARK: - Yaşam döngüsü
 
     @discardableResult
-    func start(unlockHold: Double = 2.0) -> Bool {
-        guard !isRunning else { return true }
+    func start(owner: String, unlockHold: Double = 2.0) -> Bool {
+        // Zaten kilitliyse yalnızca aynı sahip devam edebilir.
+        guard !isRunning else { return self.owner == owner }
+        self.owner = owner
+        self.failsafeFired = false
         self.unlockHold = max(0.5, unlockHold)
 
         var mask: CGEventMask = 0
@@ -103,9 +116,12 @@ final class InputLocker {
         return true
     }
 
-    func stop() {
-        guard isRunning else { return }
+    func stop(owner: String? = nil) {
+        // Yalnızca kilidi kuran taraf (ya da sahipsiz çağrı) durdurabilir.
+        if let owner, let current = self.owner, owner != current { return }
+        guard isRunning || tap != nil else { return }
         isRunning = false
+        self.owner = nil
         if let tap { CGEvent.tapEnable(tap: tap, enable: false) }
         thread?.cancel()
         if let loop { CFRunLoopStop(loop) }
@@ -123,10 +139,13 @@ final class InputLocker {
         let since = escapeSince
         let hold = unlockHold
         stateLock.unlock()
-        guard isRunning, let since else { return }
+        guard isRunning, !failsafeFired, let since else { return }
         guard Date().timeIntervalSince(since) > hold + 1.0 else { return }
 
-        isRunning = false
+        // Girdiyi hemen serbest bırak, ama tap/iş parçacığı temizliğini ana kuyruğa
+        // bırak: buradan teardown yapmak zombi iş parçacığı bırakıyor ve sonraki
+        // oturum kendi kendine açılıyordu.
+        failsafeFired = true
         if let tap { CGEvent.tapEnable(tap: tap, enable: false) }
         DispatchQueue.main.async { [weak self] in self?.onFailsafeUnlock?() }
     }
@@ -136,7 +155,16 @@ final class InputLocker {
     private func handle(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
         // Sistem tap'i askıya aldıysa hemen geri aç.
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
-            if let tap { CGEvent.tapEnable(tap: tap, enable: true) }
+            // Yalnızca oturum sürüyorsa yeniden aç; durdurulduktan sonra gelen geç
+            // bildirimle tap'i diriltme.
+            if isRunning, !failsafeFired, let tap { CGEvent.tapEnable(tap: tap, enable: true) }
+            // Askıya alma sırasında ESC keyUp'ı kaybolabilir; durumu sıfırla ki
+            // kilit kendi kendine açılmasın.
+            if escapeDown {
+                escapeDown = false
+                stateLock.lock(); escapeSince = nil; stateLock.unlock()
+                DispatchQueue.main.async { [weak self] in self?.onEscapeChanged?(false) }
+            }
             return nil
         }
         guard isRunning else { return Unmanaged.passUnretained(event) }

@@ -15,10 +15,12 @@ extension TVStrings {
         quit: "Quit",
         language: "Language",
         systemLanguage: "System language (%@)",
-
         secondsChoice: "%d seconds",
+        secondsChoiceOne: "1 second",
         minutesChoice: "%d minutes",
+        minutesChoiceOne: "1 minute",
         unlimited: "No limit",
+        countdownHoursMinutes: "%dh %02dm",
 
         themeDarkShort: "Dark",
         themeLightShort: "Light",

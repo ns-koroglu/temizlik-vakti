@@ -7,6 +7,8 @@ struct MenuPanelView: View {
     @EnvironmentObject var l10n: L10n
     @State private var permissionOK = Permissions.hasAccessibility
     @State private var tab = 0
+    /// Yayıncı body içinde yaratılırsa her yeniden çizimde sıfırlanır.
+    private let permissionTicker = Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()
 
     private var s: TVStrings { l10n.s }
 
@@ -47,8 +49,8 @@ struct MenuPanelView: View {
         .padding(16)
         .frame(width: 300)
         .onAppear { permissionOK = Permissions.hasAccessibility }
-        .onReceive(Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()) { _ in
-            if !permissionOK { permissionOK = Permissions.hasAccessibility }
+        .onReceive(permissionTicker) { _ in
+            permissionOK = Permissions.hasAccessibility
         }
     }
 
@@ -65,6 +67,7 @@ struct MenuPanelView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -142,9 +145,10 @@ struct MenuPanelView: View {
         .buttonStyle(.bordered)
         .disabled(session.isActive)
 
-        Text(.init(String(format: s.unlockHintMenu, String(format: "%.1f", prefs.unlockHold))))
+        Text(.init(String(format: s.unlockHintMenu, l10n.number(prefs.unlockHold))))
             .font(.system(size: 11))
             .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     // MARK: - Mola sekmesi
@@ -209,6 +213,7 @@ struct MenuPanelView: View {
         Text(s.breakRuleNote)
             .font(.system(size: 11))
             .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var statusLine: some View {
@@ -253,6 +258,7 @@ struct MenuPanelView: View {
             Text(s.permissionBody)
                 .font(.system(size: 11))
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
             HStack {
                 Button(s.permissionRequest) {
                     Permissions.requestAccessibility()
@@ -267,6 +273,7 @@ struct MenuPanelView: View {
             Text(s.permissionStaleNote)
                 .font(.system(size: 10))
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(10)
         .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))

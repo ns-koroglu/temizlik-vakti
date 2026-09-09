@@ -15,10 +15,12 @@ extension TVStrings {
         quit: "Çıkış",
         language: "Dil",
         systemLanguage: "Sistem dili (%@)",
-
         secondsChoice: "%d saniye",
+        secondsChoiceOne: "1 saniye",
         minutesChoice: "%d dakika",
+        minutesChoiceOne: "1 dakika",
         unlimited: "Süresiz",
+        countdownHoursMinutes: "%d sa %02d dk",
 
         themeDarkShort: "Koyu",
         themeLightShort: "Açık",

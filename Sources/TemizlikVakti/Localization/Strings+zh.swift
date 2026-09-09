@@ -10,8 +10,12 @@ extension TVStrings {
         unlockHintMenu: "长按 **esc** %@ 秒解锁。",
         settings: "设置…", quit: "退出",
         language: "语言", systemLanguage: "系统语言（%@）",
-
-        secondsChoice: "%d 秒", minutesChoice: "%d 分钟", unlimited: "不限时",
+        secondsChoice: "%d 秒",
+        secondsChoiceOne: "1 秒",
+        minutesChoice: "%d 分钟",
+        minutesChoiceOne: "1 分钟",
+        unlimited: "不限时",
+        countdownHoursMinutes: "%d 小时 %02d 分",
 
         themeDarkShort: "深色", themeLightShort: "浅色", themeColorShort: "彩色",
         themeDarkLong: "深色（最容易看清灰尘）",

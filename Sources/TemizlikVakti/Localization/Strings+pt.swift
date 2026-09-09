@@ -10,8 +10,12 @@ extension TVStrings {
         unlockHintMenu: "Segure **esc** por %@ s para desbloquear.",
         settings: "Ajustes…", quit: "Sair",
         language: "Idioma", systemLanguage: "Idioma do sistema (%@)",
-
-        secondsChoice: "%d segundos", minutesChoice: "%d minutos", unlimited: "Sem limite",
+        secondsChoice: "%d segundos",
+        secondsChoiceOne: "1 segundo",
+        minutesChoice: "%d minutos",
+        minutesChoiceOne: "1 minuto",
+        unlimited: "Sem limite",
+        countdownHoursMinutes: "%d h %02d min",
 
         themeDarkShort: "Escuro", themeLightShort: "Claro", themeColorShort: "Cor",
         themeDarkLong: "Escuro (mostra melhor a poeira)",

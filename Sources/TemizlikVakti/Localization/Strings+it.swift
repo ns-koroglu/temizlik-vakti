@@ -10,8 +10,12 @@ extension TVStrings {
         unlockHintMenu: "Tieni premuto **esc** per %@ s per sbloccare.",
         settings: "Impostazioni…", quit: "Esci",
         language: "Lingua", systemLanguage: "Lingua di sistema (%@)",
-
-        secondsChoice: "%d secondi", minutesChoice: "%d minuti", unlimited: "Senza limite",
+        secondsChoice: "%d secondi",
+        secondsChoiceOne: "1 secondo",
+        minutesChoice: "%d minuti",
+        minutesChoiceOne: "1 minuto",
+        unlimited: "Senza limite",
+        countdownHoursMinutes: "%d h %02d min",
 
         themeDarkShort: "Scuro", themeLightShort: "Chiaro", themeColorShort: "Colore",
         themeDarkLong: "Scuro (mostra meglio la polvere)",

@@ -17,6 +17,8 @@ final class BreakSession: ObservableObject {
     @Published var pausedUntil: Date?
     @Published var tip: String = ""
     @Published var unlockProgress: Double = 0
+    /// Bu molada girdi gerçekten kilitlendi mi (tap kurulamamış olabilir)
+    @Published private(set) var strictActive = false
 
     private let shield = ShieldController()
     private let sleepGuard = SleepGuard()
@@ -66,7 +68,10 @@ final class BreakSession: ObservableObject {
     }
 
     func pause(hours: Double) {
-        pausedUntil = Date().addingTimeInterval(hours * 3600)
+        let until = Date().addingTimeInterval(hours * 3600)
+        pausedUntil = until
+        // Duraklatma bittiğinde mola anında patlamasın: sayacı da ötele.
+        nextBreakAt = until.addingTimeInterval(Double(max(1, Prefs.shared.workMinutes)) * 60)
     }
 
     func resume() {
@@ -119,13 +124,8 @@ final class BreakSession: ObservableObject {
         tip = Snark.random(from: T.s.breakTips, avoiding: nil)
         phase = .resting
 
-        shield.show(interactive: !isStrict) { isPrimary in
-            AnyView(BreakScreenView(isPrimary: isPrimary)
-                .environmentObject(BreakSession.shared)
-                .environmentObject(Prefs.shared)
-                .environmentObject(L10n.shared))
-        }
-
+        // Önce kilidi kur: başarısız olursa yumuşak moda düşüp kalkanı
+        // etkileşimli açmalıyız (aksi hâlde Ertele/Atla düğmeleri ölü kalıyordu).
         if isStrict {
             let locker = InputLocker.shared
             locker.onEscapeChanged = { [weak self] down in
@@ -134,10 +134,21 @@ final class BreakSession: ObservableObject {
                 if !down { self.unlockProgress = 0 }
             }
             locker.onFailsafeUnlock = { [weak self] in self?.endBreak(completed: false) }
-            if !locker.start(unlockHold: Prefs.shared.unlockHold) {
+            if !locker.start(owner: "break", unlockHold: Prefs.shared.unlockHold) {
+                locker.onEscapeChanged = nil
+                locker.onFailsafeUnlock = nil
                 isStrict = false
             }
         }
+        strictActive = isStrict
+
+        shield.show(interactive: !isStrict) { isPrimary in
+            AnyView(BreakScreenView(isPrimary: isPrimary)
+                .environmentObject(BreakSession.shared)
+                .environmentObject(Prefs.shared)
+                .environmentObject(L10n.shared))
+        }
+
         if !isStrict {
             NSApp.activate(ignoringOtherApps: true)
             keyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown]) { [weak self] event in
@@ -161,7 +172,7 @@ final class BreakSession: ObservableObject {
     private func tick() {
         guard phase == .resting else { return }
         let now = Date()
-        let dt = now.timeIntervalSince(lastTick)
+        let dt = min(now.timeIntervalSince(lastTick), 1.0)   // uykudan dönüşte sıçramasın
         lastTick = now
         remaining = max(0, remaining - dt)
 
@@ -176,10 +187,11 @@ final class BreakSession: ObservableObject {
         guard phase == .resting else { return }
         ticker?.invalidate(); ticker = nil
         if isStrict {
-            InputLocker.shared.stop()
+            InputLocker.shared.stop(owner: "break")
             InputLocker.shared.onEscapeChanged = nil
             InputLocker.shared.onFailsafeUnlock = nil
         }
+        strictActive = false
         if let keyMonitor { NSEvent.removeMonitor(keyMonitor) }
         keyMonitor = nil
         sleepGuard.end()
@@ -206,7 +218,8 @@ final class BreakSession: ObservableObject {
     func abort() {
         guard phase != .idle else { return }
         ticker?.invalidate(); ticker = nil
-        if isStrict { InputLocker.shared.stop() }
+        if isStrict { InputLocker.shared.stop(owner: "break") }
+        strictActive = false
         if let keyMonitor { NSEvent.removeMonitor(keyMonitor) }
         keyMonitor = nil
         sleepGuard.end()
@@ -222,9 +235,13 @@ final class BreakSession: ObservableObject {
         phase = .resting
     }
 
-    static func countdown(_ seconds: TimeInterval) -> String {
-        let s = max(0, Int(seconds.rounded()))
-        if s >= 3600 { return String(format: "%d sa %02d dk", s / 3600, (s % 3600) / 60) }
-        return String(format: "%02d:%02d", s / 60, s % 60)
+    /// Geri sayım metni — saat/dakika kısaltmaları seçili dilden gelir.
+    static func countdown(_ seconds: TimeInterval, _ strings: TVStrings? = nil) -> String {
+        let total = max(0, Int(seconds.rounded()))
+        if total >= 3600 {
+            let format = (strings ?? T.s).countdownHoursMinutes
+            return String(format: format, total / 3600, (total % 3600) / 60)
+        }
+        return String(format: "%02d:%02d", total / 60, total % 60)
     }
 }

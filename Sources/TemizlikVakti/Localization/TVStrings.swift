@@ -20,8 +20,12 @@ struct TVStrings: Sendable {
 
     // Süre seçenekleri
     let secondsChoice: String         // %d
+    let secondsChoiceOne: String      // tekil
     let minutesChoice: String         // %d
+    let minutesChoiceOne: String      // tekil
     let unlimited: String
+    /// Saat + dakika geri sayımı, ör. "1 sa 05 dk" (%d, %02d)
+    let countdownHoursMinutes: String
 
     // Temalar
     let themeDarkShort: String

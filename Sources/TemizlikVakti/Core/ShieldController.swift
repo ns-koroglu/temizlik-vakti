@@ -3,6 +3,13 @@ import SwiftUI
 
 /// Tüm ekranları kaplayan, menü çubuğunun da üzerinde duran kalkan pencereleri.
 /// İçeriği çağıran taraf belirler (temizlik kilidi, mola ekranı, …).
+/// Kenarlıksız pencereler öntanımlı olarak key olamaz; olamayınca da
+/// önizleme ve yumuşak mola ekranındaki "esc ile çık" yolu çalışmaz.
+final class ShieldWindow: NSWindow {
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+}
+
 @MainActor
 final class ShieldController {
 
@@ -40,13 +47,15 @@ final class ShieldController {
         for w in windows { w.orderOut(nil) }
         windows.removeAll()
 
-        let mainScreen = NSScreen.main
+        // NSScreen.main uygulama etkin değilken nil olabiliyor; o durumda menü
+        // çubuğunu taşıyan ekrana düş ki ana arayüz hiçbir ekrana düşmeden kalmasın.
+        let mainScreen = NSScreen.main ?? NSScreen.screens.first
         for screen in NSScreen.screens {
             let isPrimary = (screen == mainScreen)
-            let window = NSWindow(contentRect: screen.frame,
-                                  styleMask: [.borderless],
-                                  backing: .buffered,
-                                  defer: false)
+            let window = ShieldWindow(contentRect: screen.frame,
+                                      styleMask: [.borderless],
+                                      backing: .buffered,
+                                      defer: false)
             window.isReleasedWhenClosed = false
             window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()) + 1)
             window.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary, .ignoresCycle]

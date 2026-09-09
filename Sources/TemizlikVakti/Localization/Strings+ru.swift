@@ -10,8 +10,12 @@ extension TVStrings {
         unlockHintMenu: "Удерживайте **esc** %@ с, чтобы разблокировать.",
         settings: "Настройки…", quit: "Выйти",
         language: "Язык", systemLanguage: "Язык системы (%@)",
-
-        secondsChoice: "%d секунд", minutesChoice: "%d минут", unlimited: "Без ограничения",
+        secondsChoice: "%d секунд",
+        secondsChoiceOne: "1 секунда",
+        minutesChoice: "%d минут",
+        minutesChoiceOne: "1 минута",
+        unlimited: "Без ограничения",
+        countdownHoursMinutes: "%d ч %02d мин",
 
         themeDarkShort: "Тёмная", themeLightShort: "Светлая", themeColorShort: "Цветная",
         themeDarkLong: "Тёмная (лучше видно пыль)",
