@@ -1,109 +1,186 @@
 # Temizlik Vakti ✨
 
-Mac'ini fiziksel olarak silerken (ekran, klavye, trackpad) yanlışlıkla bir yerlere
-basmayasın diye **klavye ve fare/trackpad girişini kilitleyen** menü çubuğu uygulaması.
-Üstüne bir de **göz molası hatırlatıcısı** var.
+Mac'ini silerken **klavye ve trackpad'i kilitleyen** menü çubuğu uygulaması —
+ekranı, klavyeyi, kapağı rahatça temizle, hiçbir tuş bir yere gitmesin.
+Üstüne düzenli **göz molası** hatırlatıcısı, animasyonlu bir maskot ve laf sokan
+yorumlar.
 
-[CleanupBuddy](https://cleanupbuddy.app) ile aynı fikir; Türkçe arayüz, kendi maskotu,
-laf sokan yorumlar ve gizli numaralarla. Apple Silicon (macOS 14+) için yazıldı.
+[![Sürüm](https://img.shields.io/github/v/release/ns-koroglu/temizlik-vakti)](https://github.com/ns-koroglu/temizlik-vakti/releases)
+[![Lisans](https://img.shields.io/github/license/ns-koroglu/temizlik-vakti)](LICENSE)
+macOS 14+ · Apple Silicon ve Intel · SwiftUI
 
-| Kilit ekranı | Göz molası | Parti modu (gizli) |
+| Kilit ekranı | Göz molası | Karşılama |
 |---|---|---|
-| ![Kilit ekranı](docs/kilit-ekrani.png) | ![Mola ekranı](docs/mola-ekrani.png) | ![Parti modu](docs/parti-modu.png) |
+| ![Kilit ekranı](docs/kilit-ekrani.png) | ![Mola ekranı](docs/mola-ekrani.png) | ![Karşılama](docs/karsilama.png) |
+
+---
 
 ## Ne yapar
 
-**Temizlik kilidi** — Tüm ekranlar kaplanır, klavye/trackpad/fare girişi sistem
-genelinde yutulur. Sen silerken hiçbir tuş bir yere gitmez. Kilidi `esc` tuşunu
-basılı tutarak ya da süre dolunca açarsın.
+**Temizlik kilidi.** Tüm ekranlar kaplanır ve klavye, trackpad, fare girdisi sistem
+genelinde yutulur. Kilidi `esc` tuşunu basılı tutarak ya da süre dolduğunda açarsın.
 
-**Göz molası (20-20-20)** — Her 20 dakikada bir, 20 saniyeliğine ekranı kaplayan
-mola ekranı. Katı modda giriş de kilitlenir; normal modda `esc` ile geçilir veya
-5 dakika ertelenir. Bilgisayarın başında değilsen mola atlanır.
+**Göz molası (20-20-20).** Her 20 dakikada bir 20 saniyelik mola ekranı. Mola
+**habersiz başlamaz**: 15 saniye önce sağ üstte küçük bir uyarı belirir, oradan
+"şimdi başla" ya da "5 dk sonra" diyebilirsin. Bilgisayarın başında değilsen mola
+atlanır. Katı modda molada giriş de kilitlenir.
 
-Mola **habersiz başlamaz**: 15 saniye önce ekranın sağ üstünde küçük bir uyarı belirir,
-oradan "şimdi başla" ya da "5 dk sonra" diyebilirsin.
+**Maskot seni takip eder.** Kilitliyken imleç donuktur ama uygulama trackpad
+hareketlerini zaten yakaladığı için maskot gözleriyle seni izler. Yanlışlıkla bir
+tuşa basarsan irkilir ve laf sokar.
 
-**İlk çalıştırma** — Kurulumdan sonra kısa bir karşılama açılır: ne işe yaradığını
-anlatır, Erişilebilirlik iznini oradan verdirir, göz molası ve girişte başlatmayı
-tek dokunuşla açtırır.
+**İstatistikler.** Kaç temizlik yaptın, toplam ne kadar sürdü, kaç girdi engellendi,
+kaç kusursuz tur, kaç mola. Tamamen yerel, hiçbir yere gönderilmez.
 
-**İstatistikler** — Kaç temizlik yaptın, toplam ne kadar sürdü, kaç girdi engellendi,
-kaç kusursuz tur ve kaç mola. Tamamen yerel, hiçbir yere gönderilmiyor.
+**On dil.** Sistem diline göre kendini ayarlar.
 
-**Maskot** — Kilitliyken imleç donuktur ama uygulama trackpad hareketlerini zaten
-yakaladığı için maskot **gözleriyle seni takip eder**. Yanlışlıkla tuşa basarsan
-irkilir ve laf sokar.
+---
 
 ## Kurulum
 
-**Hazır paket:** [Releases](https://github.com/ns-koroglu/temizlik-vakti/releases) sayfasından
-`.zip`'i indir, `Temizlik Vakti.app`'i `/Applications`'a taşı. Uygulama Apple Developer
-kimliğiyle notarize edilmediği için macOS ilk açılışta uyarı verir: **sağ tık → Aç** de
-(ya da `xattr -dr com.apple.quarantine "/Applications/Temizlik Vakti.app"`).
+### Hazır paket
 
-**Kaynaktan:**
+[Releases](https://github.com/ns-koroglu/temizlik-vakti/releases) sayfasından `.zip`'i
+indir, `Temizlik Vakti.app`'i `/Applications`'a taşı, **sağ tık → Aç** de.
+
+Paket Apple Developer kimliğiyle notarize edilmediği için macOS ilk açılışta uyarı
+gösterir. Sağ tık → Aç ile geçilir; alternatif olarak:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Temizlik Vakti.app"
+```
+
+### Kaynaktan
 
 ```bash
 ./build.sh --install --run
 ```
 
-Derler, `Temizlik Vakti.app` paketini üretir, `/Applications` içine kopyalar ve
-çalıştırır. Sadece derlemek için `./build.sh`.
+Derler, `.app` paketini üretir, imzalar, `/Applications`'a kopyalar ve çalıştırır.
+Xcode ya da Command Line Tools yeterli; Xcode projesi yok, Swift Package Manager ile
+derleniyor.
 
-### İlk çalıştırma — Erişilebilirlik izni
+---
 
-Girişi kilitlemek için macOS'un **Erişilebilirlik** iznine ihtiyaç var:
+## İzin: Erişilebilirlik
 
-1. Menü çubuğundaki ✨ simgesine tıkla → **İzin İste**
-2. Sistem Ayarları → **Gizlilik ve Güvenlik → Erişilebilirlik** listesinde
-   *Temizlik Vakti*'ni aç
-3. Panelde **Yenile**'ye bas
+Girişi kilitlemek için macOS'un **Erişilebilirlik** izni şart. İlk çalıştırmada açılan
+karşılama ekranı bunu adım adım verdirir. Elle vermek istersen: Sistem Ayarları →
+Gizlilik ve Güvenlik → Erişilebilirlik → *Temizlik Vakti*.
 
 ### İzni bir kez ver, kalıcı olsun
 
-macOS, Erişilebilirlik iznini uygulamanın **kod imzasına** bağlar. Ad-hoc imzada
-(`codesign -s -`) bu bağ imzanın özetidir (cdhash) ve her yeniden derlemede değişir:
-Sistem Ayarları'ndaki anahtar **açık görünmeye devam eder ama izin geçersizdir**.
-Klasik belirti: "izni verdim, uyarı hâlâ duruyor."
+macOS bu izni uygulamanın **kod imzasına** bağlar. Ad-hoc imzada (`codesign -s -`) bağ
+imzanın özetidir (cdhash) ve her yeniden derlemede değişir: Sistem Ayarları'ndaki
+anahtar **açık görünmeye devam eder ama izin geçersizdir**. Klasik belirti: "izni
+verdim, uyarı hâlâ duruyor."
 
-Kalıcı çözüm — bir kez sabit, yerel bir imza kimliği oluştur:
+Kaynaktan derliyorsan bir kez sabit, yerel bir imza kimliği oluştur:
 
 ```bash
 ./Scripts/setup-signing.sh
 ```
 
-Bu, giriş anahtarlığına kendinden imzalı bir kod imzalama sertifikası ekler ve
-`build.sh` bundan sonra onunla imzalar. İmza gereksinimi sertifikaya bağlandığı için
+Giriş anahtarlığına kendinden imzalı bir kod imzalama sertifikası ekler ve `build.sh`
+bundan sonra onunla imzalar. Gereksinim sertifikaya bağlandığı için
 (`identifier "app.temizlikvakti.mac" and certificate root = H"…"`) izin, yeniden
-derlemelerden etkilenmez.
-
-Kurulumdan sonra bir kez temizlik:
+derlemelerden etkilenmez. Eski geçersiz kayıtları temizlemek için:
 
 ```bash
-tccutil reset Accessibility app.temizlikvakti.mac   # eski geçersiz kayıtları sil
+tccutil reset Accessibility app.temizlikvakti.mac
 ```
 
-sonra izni yeniden ver. Kimliği kaldırmak istersen:
-`security delete-identity -c "Yerel Kod Imzasi"`
+Uygulama izni gerçek bir event tap denemesiyle sınar, izin verildiği anda uyarı kartı
+kendiliğinden kaybolur ve kartta bir **Yeniden Başlat** düğmesi vardır.
 
-Uygulama izni artık gerçek bir event tap denemesiyle sınıyor (yalnızca
-`AXIsProcessTrusted()` ile değil), izin verildiği anda uyarı kartı kendiliğinden
-kayboluyor ve kartta bir **Yeniden Başlat** düğmesi var.
+---
 
-### Notarization (dağıtım için)
+## Kullanım
 
-Yerel kendinden imzalı paketi indiren kişi Gatekeeper uyarısı görür. Uyarısız açılan
-bir paket üretmek için Apple onayı (notarization) gerekir:
+| İşlem | Nasıl |
+|---|---|
+| Temizliği başlat | Menü çubuğu → **Temizliğe Başla** |
+| Kısayolla başlat | `⌃ ⌥ ⌘ C` |
+| Kilidi aç | `esc` tuşunu ~2 sn basılı tut |
+| Otomatik açılma | Seçilen süre dolunca (30 sn … 10 dk veya süresiz) |
+| Kilitlemeden dene | Menü çubuğu → **Önizle** |
+| Mola ayarları | Menü çubuğu → **Mola** sekmesi |
+| İstatistikler | Ayarlar → **İstatistikler** |
+| Dil | Menü çubuğu → 🌐 ya da Ayarlar → Genel → Dil |
+| Karşılamayı tekrar aç | Ayarlar → Genel |
+
+Menü çubuğu simgesi durumu gösterir: kilit/mola sürüyor, mola yaklaşıyor, hatırlatıcı
+duraklatılmış.
+
+### Temalar
+
+**Koyu** (ekran tozunu en iyi gösterir) · **Açık** (parmak izi ve leke için) ·
+**Renkli** (gradyan)
+
+### Gizli numaralar 🥚
+
+Kilit ekranındayken:
+
+- **Klasik hile kodu** (↑↑↓↓←→←→BA) → parti modu: gökkuşağı fon, parıltı patlaması
+- **"temiz" yaz** → sünger seni sever
+- **Hızlı hızlı bir şeylere bas** → maskot sinirlenir
+- **Trackpad'de sağa sola savur** → başı döner
+- **45 saniye hiçbir şeye dokunma** → uyuklar
+- **Caps Lock** → "Bağırmana gerek yok"
+- **Hiç dokunmadan bitir** → "Kusursuz tur" rozeti
+
+---
+
+## Diller
+
+🇹🇷 Türkçe (varsayılan) · 🇬🇧 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français ·
+🇮🇹 Italiano · 🇵🇹 Português · 🇷🇺 Русский · 🇨🇳 简体中文 · 🇯🇵 日本語
+
+Açılışta **sistem diline** göre ayarlanır; sistem dili bu onun dışındaysa **Türkçe**
+kullanılır. Elle de seçilebilir, seçim kaydedilir ve anında uygulanır.
+
+Çeviriler `Sources/TemizlikVakti/Localization/` altında, dil başına tek dosya. Metinler
+tek bir `struct` üzerinden tutulduğu için **eksik çeviri mümkün değil**: yeni bir metin
+eklendiğinde çeviri dosyaları derlenmez. Yeni dil eklemek için `AppLanguage`'a bir durum
+ve karşılık gelen dosyayı eklemek yeterli.
+
+---
+
+## Güvenlik ve gizlilik
+
+Kilit süreç ömrüyle sınırlıdır:
+
+- **Uygulama kapanır ya da çökerse kilit anında açılır** — macOS event tap'i düşürür.
+- Arayüz donsa bile event tap kendi iş parçacığında `esc` basımını izler ve kilidi
+  kendi kendine açar (acil çıkış).
+- Güç düğmesi, Touch ID ve zorla kapatma macOS tarafından korunur; bunlar kilitlenemez
+  ve her zaman çalışır.
+- Bir yerde şifre alanı açıksa (secure input) macOS event tap'leri engelleyebilir.
+
+Ayrıca:
+
+- Uygulama hiçbir veriyi okumaz, yazmaz veya ağa göndermez — kaynakta tek bir ağ
+  çağrısı yok.
+- Paket **hardened runtime** ile imzalanır: klavye olaylarını gören bir sürece kütüphane
+  enjekte edilmesi ve hata ayıklayıcı iliştirilmesi engellenir.
+- Kilit sırasında yakalanan tuş kodları yalnızca gizli numaraları tanımak için bellekte
+  tutulur, oturum bitince silinir; hiçbir yere yazılmaz.
+- İstatistikler yalnızca yerel `UserDefaults` içinde durur.
+
+---
+
+## Dağıtım: notarization
+
+Yerel kendinden imzalı paketi indiren kişi Gatekeeper uyarısı görür. Uyarısız açılan bir
+paket üretmek için Apple onayı gerekir:
 
 ```bash
 ./build.sh --notarize
 ```
 
-Bu adım şunları yapar: **Developer ID Application** sertifikasıyla yeniden imzalar
-(hardened runtime + güvenli zaman damgası) → arşivleyip Apple'a gönderir ve sonucu
-bekler → onayı pakete iliştirir (`stapler staple`) → `spctl` ile doğrular →
-dağıtıma hazır `.zip` üretir.
+Developer ID Application sertifikasıyla yeniden imzalar (hardened runtime + güvenli
+zaman damgası) → Apple'a gönderip sonucu bekler → onayı pakete iliştirir
+(`stapler staple`) → `spctl` ile doğrular → dağıtıma hazır `.zip` üretir.
 
 Ön koşullar:
 
@@ -116,117 +193,78 @@ xcrun notarytool store-credentials "app.temizlikvakti.mac" --apple-id "posta@exa
 ```
 
 Parola, Apple kimliğinin normal parolası değil; [appleid.apple.com](https://appleid.apple.com)
-üzerinden üretilen **uygulamaya özel paroladır**. Alternatif olarak `APPLE_ID`,
-`TEAM_ID` ve `APP_PASSWORD` ortam değişkenlerini verebilirsin.
+üzerinden üretilen **uygulamaya özel paroladır**. Alternatif olarak `APPLE_ID`, `TEAM_ID`
+ve `APP_PASSWORD` ortam değişkenleri kullanılabilir.
 
-Sertifika ya da kimlik bilgisi yoksa betik **durur ve nedenini söyler** — sessizce
-imzasız paket üretmez. Yerel kendinden imzalı kimlik notarize edilemez; o kimlik
-yalnızca Erişilebilirlik izninin derlemeler arasında kalıcı olması için var.
+Sertifika ya da kimlik bilgisi yoksa betik **durur ve nedenini söyler**; sessizce imzasız
+paket üretmez. Yerel kendinden imzalı kimlik notarize edilemez — o kimlik yalnızca
+Erişilebilirlik izninin derlemeler arasında kalıcı olması için vardır.
 
-## Kullanım
-
-| İşlem | Nasıl |
-|---|---|
-| Temizliği başlat | Menü çubuğu → **Temizliğe Başla** |
-| Kısayolla başlat | `⌃ ⌥ ⌘ C` |
-| Kilidi aç | `esc` tuşunu ~2 sn basılı tut |
-| Otomatik açılma | Seçilen süre dolunca (30 sn … 10 dk veya süresiz) |
-| Kilitlemeden dene | Menü çubuğu → **Önizle** |
-| Mola ayarları | Menü çubuğu → **Mola** sekmesi |
-
-### Gizli numaralar 🥚
-
-Kilit ekranındayken:
-
-- **Klasik hile kodu** (↑↑↓↓←→←→BA) → parti modu: gökkuşağı arka plan, parıltı patlaması
-- **"temiz" yaz** → sünger seni sever, parıltılar saçılır
-- **Hızlı hızlı bir şeylere bas** → maskot sinirlenir: "Tamam tamam! Anladım!"
-- **Trackpad'de sağa sola savur** → başı döner, gözleri fırıl fırıl
-- **45 saniye hiçbir şeye dokunma** → maskot uyuklar (zzz)
-- **Caps Lock** → "Bağırmana gerek yok"
-- **Hiç dokunmadan bitir** → "Kusursuz tur" rozeti
-
-### Temalar
-
-**Koyu** (ekran tozunu gösterir) · **Açık** (parmak izi/kir için) · **Renkli** (gradyan)
-
-## Diller
-
-🇹🇷 Türkçe (varsayılan) · 🇬🇧 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français · 🇮🇹 Italiano · 🇵🇹 Português · 🇷🇺 Русский · 🇨🇳 简体中文 · 🇯🇵 日本語
-
-Uygulama açılışta **sistem diline** göre kendini ayarlar. Sistem dili bu on dilden
-biri değilse **Türkçe** kullanılır. Dili elle de seçebilirsin (menüdeki 🌐 düğmesi
-ya da Ayarlar → Genel → Dil); seçim kaydedilir ve anında uygulanır.
-
-Çeviriler `Sources/*/Localization/` altında, dil başına tek dosya. Metinler tek bir
-`struct` üzerinden tutulduğu için **eksik çeviri mümkün değil**: yeni bir metin
-eklendiğinde çeviri dosyaları derlenmez, tamamlanana kadar hata verir. Yeni bir dil
-eklemek için `AppLanguage`'a bir durum ve karşılık gelen dosyayı eklemek yeterli.
-
-## Güvenlik
-
-Kilit süreç ömrüyle sınırlıdır:
-
-- **Uygulama kapanır/çökerse kilit anında açılır** (macOS event tap'i düşürür)
-- Arayüz donsa bile event tap kendi iş parçacığında `esc` basımını izler ve
-  kilidi kendi kendine açar (acil çıkış)
-- Güç düğmesi, Touch ID ve zorla kapatma macOS tarafından korunur — her zaman çalışır
-- Bir yerde şifre alanı açıksa (secure input) macOS event tap'leri engelleyebilir
-
-Uygulama hiçbir veriyi okumaz, yazmaz veya ağa göndermez.
+---
 
 ## Kaldırma
 
 ```bash
-# 1) Önce "Girişte başlat" kapatılmalı (Ayarlar → Genel), yoksa hayalet giriş öğesi kalır
+# "Girişte başlat" açıksa önce Ayarlar → Genel'den kapat, yoksa hayalet giriş öğesi kalır
 osascript -e 'quit app "Temizlik Vakti"'
 rm -rf "/Applications/Temizlik Vakti.app"
-tccutil reset Accessibility app.temizlikvakti.mac    # Erişilebilirlik kaydını sil
-defaults delete app.temizlikvakti.mac                # ayarları sil
-security delete-identity -c "Yerel Kod Imzasi"       # imza kimliğini de silmek istersen
+tccutil reset Accessibility app.temizlikvakti.mac   # Erişilebilirlik kaydı
+defaults delete app.temizlikvakti.mac               # ayarlar ve istatistikler
+security delete-identity -c "Yerel Kod Imzasi"      # yerel imza kimliğini de silmek istersen
 ```
+
+---
 
 ## Proje yapısı
 
 ```
-Package.swift                  SwiftPM tanımı (SwiftUI + AppKit, macOS 14+)
-build.sh                       Derleme, .app paketleme, ad-hoc imzalama, kurulum
-Resources/Info.plist           Paket bilgileri (LSUIElement: menü çubuğu uygulaması)
-Scripts/makeicon.swift         Uygulama simgesini kodla çizer (1024px → .icns)
+Package.swift                    SwiftPM tanımı (SwiftUI + AppKit, macOS 14+)
+build.sh                         Derleme, paketleme, imzalama, kurulum, notarization
+Scripts/setup-signing.sh         Sabit yerel imza kimliği (izin kalıcılığı için)
+Scripts/makeicon.swift           Uygulama simgesini kodla çizer (1024px → .icns)
+Resources/Info.plist             LSUIElement: menü çubuğu uygulaması
 Sources/TemizlikVakti/
-  App/TemizlikVaktiApp.swift   MenuBarExtra + Ayarlar sahnesi
-  App/AppDelegate.swift        Etkinlik ilkesi, genel kısayol, --render bayrağı
-  Core/InputLocker.swift       CGEvent tap: girdileri yutar, sinyal üretir, acil çıkış
-  Core/LockSession.swift       Kilit oturumu, sayaç, bakış takibi, easter egg'ler
-  Core/BreakSession.swift      20-20-20 göz molası zamanlayıcısı
-  Core/ShieldController.swift  Her ekran için kalkan penceresi (shielding level)
-  Core/Permissions.swift       Erişilebilirlik izni kontrolü/isteği
-  Core/SleepGuard.swift        Ekran uykusunu engelleyen IOKit assertion
-  Core/Prefs.swift             Ayarlar (UserDefaults) + girişte başlatma
-  Core/Sounds.swift            Sistem ses efektleri
-  Content/Snark.swift          Rastgele metin seçici
-  Localization/                10 dil, dil başına tek dosya (TVStrings)
-  Views/LockScreenView.swift   Kilit ekranı
-  Views/BreakScreenView.swift  Mola ekranı
-  Views/MascotView.swift       SwiftUI ile çizilen sünger maskot (bakış + ruh hâlleri)
-  Views/BubbleField.swift      Canvas köpükler + sarsılma efekti
-  Views/SparkleBurst.swift     Easter egg parıltı patlaması
-  Views/MenuPanelView.swift    Menü çubuğu paneli (Temizlik / Mola sekmeleri)
-  Views/SettingsView.swift     Ayarlar penceresi
-  Views/RenderPreview.swift    Ekranları PNG'ye çizen geliştirme yardımcısı
-Scripts/setup-signing.sh       Sabit yerel imza kimliği oluşturur (izin kalıcılığı için)
+  App/TemizlikVaktiApp.swift     MenuBarExtra + Ayarlar sahnesi, simge durumu
+  App/AppDelegate.swift          Etkinlik ilkesi, genel kısayol, geliştirme bayrakları
+  Core/InputLocker.swift         CGEvent tap: girdileri yutar, sahiplik jetonu, acil çıkış
+  Core/LockSession.swift         Kilit oturumu, sayaç, bakış takibi, easter egg'ler
+  Core/BreakSession.swift        Göz molası: ön uyarı fazı, zamanlayıcı, katı mod
+  Core/ShieldController.swift    Her ekran için kalkan penceresi (shielding level)
+  Core/Permissions.swift         Erişilebilirlik izni kontrolü, isteme, yeniden başlatma
+  Core/Stats.swift               Yerel kullanım istatistikleri
+  Core/SleepGuard.swift          Ekran uykusunu engelleyen IOKit assertion
+  Core/Prefs.swift               Ayarlar (UserDefaults) + girişte başlatma
+  Core/Sounds.swift              Sistem ses efektleri
+  Content/Snark.swift            Rastgele metin seçici
+  Localization/                  10 dil, dil başına tek dosya (TVStrings)
+  Views/LockScreenView.swift     Kilit ekranı
+  Views/BreakScreenView.swift    Mola ekranı
+  Views/BreakWarningView.swift   Mola öncesi uyarı penceresi
+  Views/OnboardingView.swift     İlk çalıştırma karşılaması
+  Views/MascotView.swift         SwiftUI ile çizilen sünger maskot (bakış + ruh hâlleri)
+  Views/BubbleField.swift        Canvas köpükler + sarsılma efekti
+  Views/SparkleBurst.swift       Easter egg parıltı patlaması
+  Views/MenuPanelView.swift      Menü çubuğu paneli (Temizlik / Mola sekmeleri)
+  Views/SettingsView.swift       Ayarlar penceresi (Temizlik / Mola / Genel / İstatistik)
+  Views/RenderPreview.swift      Ekranları PNG'ye çizen geliştirme yardımcısı
 ```
 
 ### Geliştirme
 
 ```bash
-swift build -c release
-./build.sh --run
+swift build -c release                              # yalnızca derle
+./build.sh --run                                    # derle + paketle + çalıştır
+./build.sh --reset-perm                             # Erişilebilirlik kaydını sıfırla
+```
+
+Ekranları **kilitlemeden** PNG olarak çizmek için:
+
+```bash
 "build/Temizlik Vakti.app/Contents/MacOS/TemizlikVakti" --render /tmp/onizleme.png lock
 ```
 
-Son komut kilit ekranını **ekranı kilitlemeden** PNG olarak çizer.
-Modlar: `lock`, `break`, `party`.
+Modlar: `lock` (varsayılan), `break`, `party`, `onboard`, `warning`. Erişilebilirlik
+izninin gerçekten geçerli olup olmadığını ölçmek için `--check`.
 
 ---
 
@@ -234,14 +272,18 @@ Modlar: `lock`, `break`, `party`.
 
 **Temizlik Vakti** ("Cleaning Time") is a macOS menu bar app that locks your keyboard,
 trackpad and mouse so you can physically clean your Mac without triggering anything,
-plus a 20-20-20 eye break reminder. It draws a full-screen shield over every display,
-swallows all input through a `CGEventTap`, and unlocks when you hold `esc` (or when the
-timer runs out). The mascot follows your trackpad movements even while input is frozen,
-and there are a few easter eggs hidden in there. Available in 10 languages
-(Turkish, English, German, Spanish, French, Italian, Portuguese, Russian, Chinese,
-Japanese) — it follows your system language and falls back to Turkish. Requires Accessibility
-permission; the lock dies with the process, so a crash or quit always restores input.
+plus a 20-20-20 eye break reminder that warns you 15 seconds before it takes over the
+screen. It draws a full-screen shield over every display, swallows all input through a
+`CGEventTap`, and unlocks when you hold `esc` (or when the timer runs out). The mascot
+follows your trackpad movements even while input is frozen, and there are a few easter
+eggs hidden in there.
 
-Build with `./build.sh --install --run` (needs Xcode or Command Line Tools, macOS 14+).
+Available in 10 languages (Turkish, English, German, Spanish, French, Italian,
+Portuguese, Russian, Chinese, Japanese) — it follows your system language and falls back
+to Turkish. Requires Accessibility permission; the lock dies with the process, so a crash
+or quit always restores input. Signed with hardened runtime; nothing leaves your Mac.
+
+Download from [Releases](https://github.com/ns-koroglu/temizlik-vakti/releases) or build
+with `./build.sh --install --run` (macOS 14+).
 
 MIT lisanslı.
