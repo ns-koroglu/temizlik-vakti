@@ -249,6 +249,27 @@ Sources/TemizlikVakti/
   Views/RenderPreview.swift      Ekranları PNG'ye çizen geliştirme yardımcısı
 ```
 
+### Sürüm numarası
+
+Sürüm elle yönetilmiyor: `build.sh` her derlemede git'ten türetiyor.
+
+| Alan | Kaynak | Örnek |
+|---|---|---|
+| `CFBundleShortVersionString` | En son git etiketi (`v` atılır) | `v1.1.0` → `1.1.0` |
+| `CFBundleVersion` | Toplam commit sayısı | `9` |
+
+Yeni sürüm çıkarmak için etiket atman yeterli:
+
+```bash
+git tag v1.2.0 && git push --tags
+./build.sh --install
+```
+
+Değerler pakete **imzalamadan önce** yazılır (sonrasında yazmak imzayı bozar).
+Git deposu ya da etiket yoksa `Resources/Info.plist`'teki değerler korunur, derleme
+durmaz. Etiketin ötesinde commit varsa ya da çalışma ağacı kirliyse derleme çıktısı
+bunu `[+d]` olarak belirtir.
+
 ### Geliştirme
 
 ```bash

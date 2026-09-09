@@ -34,6 +34,35 @@ done
 ERR_LOG="$(mktemp -t build_err)"
 trap 'rm -f "$ERR_LOG"' EXIT
 
+# Sürüm numarası git'ten türetilir; Resources/Info.plist yalnızca şablondur.
+#   CFBundleShortVersionString ← en son etiket (v1.1.0 → 1.1.0)
+#   CFBundleVersion            ← toplam commit sayısı (her derlemede monoton artar)
+# Etiket yoksa ya da git deposu değilse şablondaki değerler korunur.
+inject_version() {
+  local plist="$1"
+  local tag count short build
+
+  tag="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+  count="$(git rev-list --count HEAD 2>/dev/null || true)"
+
+  if [ -z "$tag" ]; then
+    echo "  (git etiketi yok — Info.plist'teki sürüm korunuyor)"
+    return
+  fi
+
+  short="${tag#v}"
+  build="${count:-1}"
+
+  # Etiketin üstünde commit varsa ya da çalışma ağacı kirliyse belirt
+  local extra=""
+  if ! git describe --tags --exact-match >/dev/null 2>&1; then extra="+"; fi
+  if [ -n "$(git status --porcelain 2>/dev/null)" ]; then extra="${extra}d"; fi
+
+  plutil -replace CFBundleShortVersionString -string "$short" "$plist"
+  plutil -replace CFBundleVersion -string "$build" "$plist"
+  echo "  sürüm: $short ($build)${extra:+  [$extra: etiketin ötesinde/kirli ağaç]}"
+}
+
 # ---------------------------------------------------------------------------
 # Notarization (Apple onayı)
 #
@@ -143,6 +172,7 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/$EXEC_NAME"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
+inject_version "$APP/Contents/Info.plist"   # imzadan ÖNCE: sonrası imzayı bozar
 cp "$OUT_DIR/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 
