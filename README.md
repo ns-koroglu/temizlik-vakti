@@ -57,8 +57,12 @@ xattr -dr com.apple.quarantine "/Applications/Temizlik Vakti.app"
 ```
 
 Derler, `.app` paketini üretir, imzalar, `/Applications`'a kopyalar ve çalıştırır.
-Xcode ya da Command Line Tools yeterli; Xcode projesi yok, Swift Package Manager ile
-derleniyor.
+Xcode projesi yok, Swift Package Manager ile derleniyor.
+
+> **Xcode gerekiyor** (yalnızca Command Line Tools yetmiyor). macOS 26'dan itibaren
+> SwiftUI'ın `@State` gibi sarmalayıcıları makro ve makro eklentisi yalnızca Xcode
+> araç zincirinde bulunuyor. Etkin araç zincirin yanlışsa `build.sh` derlemeden önce
+> durup söyler: `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
 
 ---
 

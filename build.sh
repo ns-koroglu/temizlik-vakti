@@ -145,13 +145,30 @@ notarize_app() {
 }
 
 echo "▸ Derleniyor…"
+# macOS 26'dan itibaren SwiftUI'ın @State/@Binding gibi sarmalayıcıları makro;
+# makro eklentisi (SwiftUIMacros) yalnızca Xcode araç zincirinde bulunuyor.
+# Command Line Tools ile derleme "plugin for module 'SwiftUIMacros' not found"
+# hatalarıyla düşüyor, o yüzden sessizce oraya düşmüyoruz.
+if ! xcode-select -p 2>/dev/null | grep -q "Xcode.app"; then
+  echo "✗ Etkin geliştirici dizini Xcode değil: $(xcode-select -p 2>/dev/null || echo yok)"
+  echo "  Bu proje SwiftUI makro eklentileri için Xcode araç zincirine ihtiyaç duyuyor."
+  echo "  Çözüm: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer"
+  exit 1
+fi
+
 if ! swift build -c release 2>"$ERR_LOG"; then
   if grep -q "Xcode license" "$ERR_LOG"; then
-    echo "  (Xcode lisansı onaylanmamış — Command Line Tools araç zinciriyle deneniyor)"
-    DEVELOPER_DIR=/Library/Developer/CommandLineTools swift build -c release
-  else
-    cat "$ERR_LOG"; exit 1
+    echo "✗ Xcode lisansı onaylanmamış. Şunu çalıştır: sudo xcodebuild -license accept"
+    exit 1
   fi
+  if grep -q "SwiftUIMacros" "$ERR_LOG"; then
+    echo "✗ SwiftUI makro eklentisi bulunamadı."
+    echo "  DEVELOPER_DIR değişkeni Command Line Tools'u gösteriyor olabilir:"
+    echo "    DEVELOPER_DIR=${DEVELOPER_DIR:-<ayarlı değil>}"
+    echo "  Xcode araç zinciriyle derle (değişkeni kaldır ya da Xcode'a ayarla)."
+    exit 1
+  fi
+  cat "$ERR_LOG"; exit 1
 fi
 BIN=".build/release/$EXEC_NAME"
 
@@ -159,8 +176,7 @@ echo "▸ Simge hazırlanıyor…"
 ICONSET="$OUT_DIR/AppIcon.iconset"
 rm -rf "$ICONSET"; mkdir -p "$ICONSET"
 PNG="$OUT_DIR/icon-1024.png"
-swift Scripts/makeicon.swift "$PNG" >/dev/null 2>&1 || \
-  DEVELOPER_DIR=/Library/Developer/CommandLineTools swift Scripts/makeicon.swift "$PNG" >/dev/null
+swift Scripts/makeicon.swift "$PNG" >/dev/null
 for s in 16 32 128 256 512; do
   sips -z $s $s "$PNG" --out "$ICONSET/icon_${s}x${s}.png" >/dev/null
   sips -z $((s*2)) $((s*2)) "$PNG" --out "$ICONSET/icon_${s}x${s}@2x.png" >/dev/null
