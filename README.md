@@ -91,6 +91,38 @@ Uygulama izni artık gerçek bir event tap denemesiyle sınıyor (yalnızca
 `AXIsProcessTrusted()` ile değil), izin verildiği anda uyarı kartı kendiliğinden
 kayboluyor ve kartta bir **Yeniden Başlat** düğmesi var.
 
+### Notarization (dağıtım için)
+
+Yerel kendinden imzalı paketi indiren kişi Gatekeeper uyarısı görür. Uyarısız açılan
+bir paket üretmek için Apple onayı (notarization) gerekir:
+
+```bash
+./build.sh --notarize
+```
+
+Bu adım şunları yapar: **Developer ID Application** sertifikasıyla yeniden imzalar
+(hardened runtime + güvenli zaman damgası) → arşivleyip Apple'a gönderir ve sonucu
+bekler → onayı pakete iliştirir (`stapler staple`) → `spctl` ile doğrular →
+dağıtıma hazır `.zip` üretir.
+
+Ön koşullar:
+
+1. Apple Developer Program üyeliği ve anahtarlıkta bir *Developer ID Application*
+   sertifikası (Xcode → Settings → Accounts → Manage Certificates).
+2. notarytool kimlik bilgisi — bir kez saklaman yeterli:
+
+```bash
+xcrun notarytool store-credentials "app.temizlikvakti.mac" --apple-id "posta@example.com" --team-id "ABCDE12345" --password "uygulamaya-özel-parola"
+```
+
+Parola, Apple kimliğinin normal parolası değil; [appleid.apple.com](https://appleid.apple.com)
+üzerinden üretilen **uygulamaya özel paroladır**. Alternatif olarak `APPLE_ID`,
+`TEAM_ID` ve `APP_PASSWORD` ortam değişkenlerini verebilirsin.
+
+Sertifika ya da kimlik bilgisi yoksa betik **durur ve nedenini söyler** — sessizce
+imzasız paket üretmez. Yerel kendinden imzalı kimlik notarize edilemez; o kimlik
+yalnızca Erişilebilirlik izninin derlemeler arasında kalıcı olması için var.
+
 ## Kullanım
 
 | İşlem | Nasıl |
