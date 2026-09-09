@@ -18,6 +18,17 @@ enum RenderPreview {
                 .environmentObject(b)
                 .environmentObject(Prefs.shared)
                 .environmentObject(L10n.shared))
+        case "onboard":
+            content = AnyView(OnboardingView(onFinish: {})
+                .environmentObject(Prefs.shared)
+                .environmentObject(L10n.shared)
+                .environmentObject(BreakSession.shared))
+        case "warning":
+            BreakSession.shared.configureForRender(remaining: 20, total: 20)
+            content = AnyView(BreakWarningView()
+                .environmentObject(BreakSession.shared)
+                .environmentObject(L10n.shared)
+                .frame(width: 300, height: 96))
         case "party":
             session.configureForRender(elapsed: 42, unlock: 0, nudge: nil,
                                        egg: .party, eggMessage: "Hile kodu kabul edildi. Parti modu!")
@@ -32,7 +43,9 @@ enum RenderPreview {
                 .environmentObject(L10n.shared))
         }
 
-        let view = content.frame(width: size.width, height: size.height)
+        let view = (mode == "onboard" || mode == "warning")
+            ? AnyView(content.fixedSize())
+            : AnyView(content.frame(width: size.width, height: size.height))
         let renderer = ImageRenderer(content: view)
         renderer.scale = 1
         guard let image = renderer.nsImage,

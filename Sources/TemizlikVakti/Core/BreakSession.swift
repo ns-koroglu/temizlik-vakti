@@ -9,7 +9,7 @@ final class BreakSession: ObservableObject {
 
     static let shared = BreakSession()
 
-    enum Phase: Equatable { case idle, resting, finished }
+    enum Phase: Equatable { case idle, warning, resting, finished }
 
     @Published private(set) var phase: Phase = .idle
     @Published var remaining: TimeInterval = 0
@@ -19,8 +19,13 @@ final class BreakSession: ObservableObject {
     @Published var unlockProgress: Double = 0
     /// Bu molada girdi gerçekten kilitlendi mi (tap kurulamamış olabilir)
     @Published private(set) var strictActive = false
+    /// Mola başlamadan önceki geri sayım (sn)
+    @Published private(set) var warningRemaining: Double = 0
 
     private let shield = ShieldController()
+    private let warningWindow = BreakWarningWindow()
+    /// Mola ekranı açılmadan kaç saniye önce uyarılsın
+    private let warningLead: Double = 15
     private let sleepGuard = SleepGuard()
     private var scheduler: Timer?
     private var ticker: Timer?
@@ -30,7 +35,8 @@ final class BreakSession: ObservableObject {
     private var isStrict = false
     private var totalSeconds: Double = 20
 
-    var isResting: Bool { phase != .idle }
+    /// Mola ekranı açık mı (uyarı fazı buna dahil değil)
+    var isResting: Bool { phase == .resting || phase == .finished }
 
     var progress: Double {
         guard totalSeconds > 0 else { return 0 }
@@ -68,6 +74,7 @@ final class BreakSession: ObservableObject {
     }
 
     func pause(hours: Double) {
+        if phase == .warning { exitWarning() }
         let until = Date().addingTimeInterval(hours * 3600)
         pausedUntil = until
         // Duraklatma bittiğinde mola anında patlamasın: sayacı da ötele.
@@ -86,23 +93,79 @@ final class BreakSession: ObservableObject {
 
     private func evaluate() {
         let prefs = Prefs.shared
-        guard prefs.breakEnabled else { nextBreakAt = nil; return }
-        guard phase == .idle else { return }
-        if isPaused { return }
+        guard prefs.breakEnabled else {
+            if phase == .warning { exitWarning() }
+            nextBreakAt = nil
+            return
+        }
         // Temizlik oturumu varken araya girme
         if LockSession.shared.isActive {
+            if phase == .warning { exitWarning() }
             nextBreakAt = Date().addingTimeInterval(60)
             return
         }
+        if isPaused {
+            if phase == .warning { exitWarning() }
+            return
+        }
         guard let next = nextBreakAt else { rescheduleNext(); return }
-        guard Date() >= next else { return }
+        let untilBreak = next.timeIntervalSinceNow
+
+        // Uyarı fazındaysak geri sayımı sürdür
+        if phase == .warning {
+            warningRemaining = max(0, untilBreak)
+            if untilBreak <= 0 {
+                exitWarning()
+                startBreak()
+            }
+            return
+        }
+
+        guard phase == .idle else { return }
+        guard untilBreak <= warningLead else { return }
 
         // Kullanıcı zaten başında değilse mola gösterme
         if prefs.breakSkipWhenIdle, idleSeconds() > 120 {
             nextBreakAt = Date().addingTimeInterval(60)
             return
         }
+        enterWarning(remaining: max(1, untilBreak))
+    }
+
+    // MARK: - Ön uyarı
+
+    private func enterWarning(remaining: Double) {
+        guard phase == .idle else { return }
+        phase = .warning
+        warningRemaining = remaining
+        warningWindow.show(session: self)
+        Sounds.tick()
+    }
+
+    private func exitWarning() {
+        guard phase == .warning else { return }
+        warningWindow.hide()
+        warningRemaining = 0
+        phase = .idle
+    }
+
+    /// Uyarıdaki "Şimdi başla"
+    func startBreakNow() {
+        exitWarning()
         startBreak()
+    }
+
+    /// Uyarıdaki "5 dk sonra"
+    func snoozeFromWarning(minutes: Double) {
+        exitWarning()
+        nextBreakAt = Date().addingTimeInterval(minutes * 60)
+    }
+
+    /// Kilit oturumu başlarken uyarı ekranı kalmasın.
+    func cancelWarning() {
+        guard phase == .warning else { return }
+        exitWarning()
+        nextBreakAt = Date().addingTimeInterval(60)
     }
 
     private func idleSeconds() -> Double {
@@ -199,6 +262,7 @@ final class BreakSession: ObservableObject {
         unlockProgress = 0
 
         if completed {
+            Stats.shared.recordBreak()
             phase = .finished
             tip = Snark.random(from: T.s.breakDone, avoiding: tip)
             Sounds.unlock()
@@ -216,6 +280,7 @@ final class BreakSession: ObservableObject {
     }
 
     func abort() {
+        if phase == .warning { exitWarning(); return }
         guard phase != .idle else { return }
         ticker?.invalidate(); ticker = nil
         if isStrict { InputLocker.shared.stop(owner: "break") }
@@ -231,6 +296,7 @@ final class BreakSession: ObservableObject {
     func configureForRender(remaining: Double, total: Double) {
         totalSeconds = total
         self.remaining = remaining
+        self.warningRemaining = 12
         tip = T.s.breakTips.first ?? ""
         phase = .resting
     }

@@ -106,6 +106,29 @@ struct TVStrings: Sendable {
     let settingsBreakSection: String
     let settingsBreakNote: String      // %d dakika, %d saniye
 
+    // Karşılama, mola uyarısı, istatistikler
+    let onboardWelcomeTitle: String
+    let onboardWelcomeBody: String
+    let onboardPermissionTitle: String
+    let onboardPermissionBody: String
+    let onboardBreakTitle: String
+    let onboardBreakBody: String
+    let onboardNext: String
+    let onboardDone: String
+    let onboardSkip: String
+    let breakWarningTitle: String        // %d saniye
+    let breakWarningStartNow: String
+    let breakWarningLater: String
+    let statsTitle: String
+    let statsSessions: String
+    let statsTotalTime: String
+    let statsBlockedInputs: String
+    let statsPerfectRuns: String
+    let statsBreaks: String
+    let statsReset: String
+    let statsEmpty: String
+    let settingsVersion: String        // %@
+
     // Metin listeleri
     let snark: [String]
     let preroll: [String]

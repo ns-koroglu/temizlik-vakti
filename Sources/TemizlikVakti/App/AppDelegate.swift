@@ -27,7 +27,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        MainActor.assumeIsolated { BreakSession.shared.startScheduling() }
+        MainActor.assumeIsolated {
+            BreakSession.shared.startScheduling()
+            // İlk çalıştırmada menü çubuğu uygulaması hiçbir işaret vermiyordu.
+            // Status item yerleşsin diye kısa bir gecikmeyle açıyoruz.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                Onboarding.presentIfNeeded()
+            }
+        }
 
         // Genel kısayol: ⌃⌥⌘C
         hotkeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown]) { event in

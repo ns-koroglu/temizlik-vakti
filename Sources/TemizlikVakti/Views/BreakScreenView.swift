@@ -31,6 +31,7 @@ struct BreakScreenView: View {
 
             if prefs.mascot {
                 MascotView(mood: session.phase == .finished ? .happy : .resting, size: 150)
+                    .accessibilityHidden(true)
             }
 
             if session.phase == .finished {
@@ -80,6 +81,9 @@ struct BreakScreenView: View {
                 .animation(.snappy, value: Int(ceil(session.remaining)))
         }
         .frame(width: 190, height: 190)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(str.breakTitle)
+        .accessibilityValue("\(Int(ceil(session.remaining)))")
     }
 
     @ViewBuilder

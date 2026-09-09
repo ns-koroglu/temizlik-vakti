@@ -68,8 +68,9 @@ final class LockSession: ObservableObject {
 
     func start() {
         guard phase == .idle else { return }
-        // Mola ekranı açıkken ikinci bir kalkan açma.
+        // Mola ekranı açıkken ikinci bir kalkan açma; ön uyarı varsa kapat.
         guard !BreakSession.shared.isResting else { return }
+        BreakSession.shared.cancelWarning()
         let prefs = Prefs.shared
         Sounds.enabled = prefs.sounds
 
@@ -189,6 +190,7 @@ final class LockSession: ObservableObject {
         phase = .finished
         unlockProgress = 0
         perfectRun = (pokeCount == 0 && elapsed > 15)
+        Stats.shared.recordCleaning(seconds: elapsed, blocked: pokeCount, perfect: perfectRun)
         clearEgg()
         line = perfectRun
             ? T.s.perfectRun

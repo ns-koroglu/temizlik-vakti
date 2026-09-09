@@ -21,11 +21,28 @@ basılı tutarak ya da süre dolunca açarsın.
 mola ekranı. Katı modda giriş de kilitlenir; normal modda `esc` ile geçilir veya
 5 dakika ertelenir. Bilgisayarın başında değilsen mola atlanır.
 
+Mola **habersiz başlamaz**: 15 saniye önce ekranın sağ üstünde küçük bir uyarı belirir,
+oradan "şimdi başla" ya da "5 dk sonra" diyebilirsin.
+
+**İlk çalıştırma** — Kurulumdan sonra kısa bir karşılama açılır: ne işe yaradığını
+anlatır, Erişilebilirlik iznini oradan verdirir, göz molası ve girişte başlatmayı
+tek dokunuşla açtırır.
+
+**İstatistikler** — Kaç temizlik yaptın, toplam ne kadar sürdü, kaç girdi engellendi,
+kaç kusursuz tur ve kaç mola. Tamamen yerel, hiçbir yere gönderilmiyor.
+
 **Maskot** — Kilitliyken imleç donuktur ama uygulama trackpad hareketlerini zaten
 yakaladığı için maskot **gözleriyle seni takip eder**. Yanlışlıkla tuşa basarsan
 irkilir ve laf sokar.
 
 ## Kurulum
+
+**Hazır paket:** [Releases](https://github.com/ns-koroglu/temizlik-vakti/releases) sayfasından
+`.zip`'i indir, `Temizlik Vakti.app`'i `/Applications`'a taşı. Uygulama Apple Developer
+kimliğiyle notarize edilmediği için macOS ilk açılışta uyarı verir: **sağ tık → Aç** de
+(ya da `xattr -dr com.apple.quarantine "/Applications/Temizlik Vakti.app"`).
+
+**Kaynaktan:**
 
 ```bash
 ./build.sh --install --run

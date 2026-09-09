@@ -63,6 +63,7 @@ struct MenuPanelView: View {
         HStack(spacing: 10) {
             MascotView(mood: .ready, size: 44, animated: false)
                 .frame(width: 58, height: 52)
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Temizlik Vakti")
                     .font(.system(size: 15, weight: .bold, design: .rounded))
@@ -94,6 +95,7 @@ struct MenuPanelView: View {
         .menuIndicator(.hidden)
         .frame(width: 26)
         .help(s.language)
+        .accessibilityLabel(s.language)
     }
 
     // MARK: - Temizlik sekmesi
@@ -231,6 +233,8 @@ struct MenuPanelView: View {
             .padding(.vertical, 6).padding(.horizontal, 10)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.secondary.opacity(0.10), in: RoundedRectangle(cornerRadius: 7))
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(statusText)
         }
     }
 

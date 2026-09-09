@@ -76,6 +76,7 @@ struct LockScreenView: View {
                 MascotView(mood: mood, size: 190,
                            gaze: session.gaze,
                            liveMouse: session.isPreview)
+                    .accessibilityHidden(true)
                     .modifier(Shake(animatableData: CGFloat(session.nudgeCount)))
                     .animation(.spring(response: 0.35, dampingFraction: 0.35), value: session.nudgeCount)
             }
@@ -134,6 +135,9 @@ struct LockScreenView: View {
                  : LockSession.clock(session.elapsed))
                 .font(.system(size: 76, weight: .bold, design: .rounded))
                 .monospacedDigit()
+                .accessibilityLabel(session.duration > 0
+                                    ? LockSession.clock(session.remaining)
+                                    : LockSession.clock(session.elapsed))
 
             if session.duration > 0 {
                 ZStack(alignment: .leading) {
@@ -221,6 +225,9 @@ struct LockScreenView: View {
             .overlay(Capsule().strokeBorder(theme.fg.opacity(0.16), lineWidth: 1))
             .clipShape(Capsule())
             .animation(.linear(duration: 0.05), value: session.unlockProgress)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(str.unlockHold)
+            .accessibilityValue("\(Int(session.unlockProgress * 100))%")
 
             // Önizlemede giriş kilitli DEĞİL; "kilitli" demek kullanıcıyı
             // gerçekten silmeye başlaması için yanlış yönlendiriyordu.

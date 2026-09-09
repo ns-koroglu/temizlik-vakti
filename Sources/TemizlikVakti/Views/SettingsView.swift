@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject var prefs: Prefs
     @EnvironmentObject var breaks: BreakSession
     @EnvironmentObject var l10n: L10n
+    @StateObject private var stats = Stats.shared
     @State private var permissionOK = Permissions.hasAccessibility
 
     private var s: TVStrings { l10n.s }
@@ -16,6 +17,8 @@ struct SettingsView: View {
                 .tabItem { Label(s.tabBreak, systemImage: "eye") }
             general
                 .tabItem { Label(s.settingsGeneral, systemImage: "gearshape") }
+            statistics
+                .tabItem { Label(s.statsTitle, systemImage: "chart.bar") }
         }
         .frame(width: 500, height: 540)
         .onAppear { permissionOK = Permissions.hasAccessibility }
@@ -94,6 +97,26 @@ struct SettingsView: View {
         .formStyle(.grouped)
     }
 
+    private var statistics: some View {
+        Form {
+            if stats.isEmpty {
+                Section { Text(s.statsEmpty).font(.system(size: 12)).foregroundStyle(.secondary) }
+            } else {
+                Section(s.statsTitle) {
+                    LabeledContent(s.statsSessions, value: "\(stats.sessions)")
+                    LabeledContent(s.statsTotalTime, value: stats.totalTimeText(s))
+                    LabeledContent(s.statsBlockedInputs, value: "\(stats.blockedInputs)")
+                    LabeledContent(s.statsPerfectRuns, value: "\(stats.perfectRuns)")
+                    LabeledContent(s.statsBreaks, value: "\(stats.breaksCompleted)")
+                }
+                Section {
+                    Button(s.statsReset) { stats.reset() }
+                }
+            }
+        }
+        .formStyle(.grouped)
+    }
+
     private var general: some View {
         Form {
             Section {
@@ -113,6 +136,20 @@ struct SettingsView: View {
                     Spacer()
                     Button(s.settingsOpenSettings) { Permissions.openAccessibilitySettings() }
                     Button(s.settingsRefresh) { permissionOK = Permissions.hasAccessibility }
+                }
+            }
+
+            Section {
+                HStack {
+                    Text(String(format: s.settingsVersion, Stats.appVersion))
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button(s.onboardWelcomeTitle) { Onboarding.present() }
+                        .buttonStyle(.link)
+                        .font(.system(size: 11))
+                    Link("GitHub", destination: URL(string: "https://github.com/ns-koroglu/temizlik-vakti")!)
+                        .font(.system(size: 11))
                 }
             }
 
