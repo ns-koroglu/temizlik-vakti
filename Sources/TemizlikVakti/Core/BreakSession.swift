@@ -74,6 +74,7 @@ final class BreakSession: ObservableObject {
     }
 
     func pause(hours: Double) {
+        guard phase == .idle || phase == .warning else { return }
         if phase == .warning { exitWarning() }
         let until = Date().addingTimeInterval(hours * 3600)
         pausedUntil = until

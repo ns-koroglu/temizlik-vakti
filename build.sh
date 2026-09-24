@@ -32,7 +32,8 @@ done
 
 # Hata günlüğü dünya-yazılır /tmp yerine güvenli geçici dosyaya
 ERR_LOG="$(mktemp -t build_err)"
-trap 'rm -f "$ERR_LOG"' EXIT
+SIGN_STAGE="$(mktemp -d -t temizlik-vakti-sign)"
+trap 'rm -f "$ERR_LOG"; rm -rf "$SIGN_STAGE"' EXIT
 
 # Sürüm numarası git'ten türetilir; Resources/Info.plist yalnızca şablondur.
 #   CFBundleShortVersionString ← en son etiket (v1.1.0 → 1.1.0)
@@ -192,6 +193,17 @@ inject_version "$APP/Contents/Info.plist"   # imzadan ÖNCE: sonrası imzayı bo
 cp "$OUT_DIR/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 
+# Finder/file-provider metadata can be added back to visible .app bundles while
+# codesign is running. Move the bundle to a private staging directory first so
+# signing and verification are deterministic.
+mv "$APP" "$SIGN_STAGE/$APP_NAME.app"
+APP="$SIGN_STAGE/$APP_NAME.app"
+
+# Finder/file-provider metadata is not part of an application bundle and can
+# make codesign --verify reject an otherwise valid local build. Strip it before
+# signing so a bundle touched by Finder remains verifiable and installable.
+xattr -rc "$APP" 2>/dev/null || true
+
 SIGN_IDENTITY="${SIGN_IDENTITY:-Yerel Kod Imzasi}"
 if security find-certificate -c "$SIGN_IDENTITY" >/dev/null 2>&1; then
   echo "▸ İmzalanıyor ($SIGN_IDENTITY, hardened runtime)…"
@@ -206,15 +218,27 @@ else
   STABLE_SIGN=0
 fi
 
+codesign --verify --deep --strict "$APP"
+
 if [ "$NOTARIZE" = "1" ]; then
   notarize_app "$APP"
 fi
+
+# Publish the verified bundle at the documented build path only after signing
+# (and optional notarization) has completed.
+rm -rf "$OUT_DIR/$APP_NAME.app"
+mv "$APP" "$OUT_DIR/$APP_NAME.app"
+APP="$OUT_DIR/$APP_NAME.app"
+codesign --verify --deep --strict "$APP"
 
 if [ "$INSTALL" = "1" ]; then
   echo "▸ /Applications içine kopyalanıyor…"
   osascript -e 'quit app "Temizlik Vakti"' >/dev/null 2>&1 || true
   rm -rf "/Applications/$APP_NAME.app"
   cp -R "$APP" "/Applications/$APP_NAME.app"
+  # cp may carry Finder/file-provider metadata onto the installed bundle too.
+  xattr -rc "/Applications/$APP_NAME.app" 2>/dev/null || true
+  codesign --verify --deep --strict "/Applications/$APP_NAME.app"
   # Yerel kopyayı bırakma: Spotlight/Launchpad'de aynı uygulamanın iki kaydı görünmesin
   rm -rf "$OUT_DIR/$APP_NAME.app"
   APP="/Applications/$APP_NAME.app"

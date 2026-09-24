@@ -35,8 +35,6 @@ struct TemizlikVaktiApp: App {
                 .environmentObject(prefs)
                 .environmentObject(breaks)
                 .environmentObject(l10n)
-                .environmentObject(breaks)
-                .environmentObject(l10n)
         }
     }
 }

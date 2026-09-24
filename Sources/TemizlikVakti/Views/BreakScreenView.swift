@@ -88,7 +88,7 @@ struct BreakScreenView: View {
 
     @ViewBuilder
     private var controls: some View {
-        if prefs.breakStrict && Permissions.hasAccessibility {
+        if session.strictActive {
             VStack(spacing: 12) {
                 ZStack(alignment: .leading) {
                     Capsule().fill(theme.fg.opacity(0.09))

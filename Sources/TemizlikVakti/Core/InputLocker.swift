@@ -41,25 +41,61 @@ final class InputLocker {
     private var thread: Thread?
     private var loop: CFRunLoop?
 
-    private(set) var isRunning = false
+    private var _isRunning = false
+    private var isRunning: Bool {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _isRunning }
+        set { stateLock.lock(); _isRunning = newValue; stateLock.unlock() }
+    }
     /// Kilidi kim kurdu ("lock" ya da "break") — iki oturum birbirinin kilidini sökmesin.
-    private(set) var owner: String?
-    private var failsafeFired = false
+    private var _owner: String?
+    private var owner: String? {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _owner }
+        set { stateLock.lock(); _owner = newValue; stateLock.unlock() }
+    }
+    private var _failsafeFired = false
+    private var failsafeFired: Bool {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _failsafeFired }
+        set { stateLock.lock(); _failsafeFired = newValue; stateLock.unlock() }
+    }
 
     /// ESC basılı tutma durumu değiştiğinde ana kuyrukta çağrılır.
-    var onEscapeChanged: ((Bool) -> Void)?
+    private var _onEscapeChanged: ((Bool) -> Void)?
+    var onEscapeChanged: ((Bool) -> Void)? {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _onEscapeChanged }
+        set { stateLock.lock(); _onEscapeChanged = newValue; stateLock.unlock() }
+    }
     /// Yutulan her olayın özeti (ana kuyrukta). Maskotun tepki vermesi için.
-    var onSignal: ((InputSignal) -> Void)?
+    private var _onSignal: ((InputSignal) -> Void)?
+    var onSignal: ((InputSignal) -> Void)? {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _onSignal }
+        set { stateLock.lock(); _onSignal = newValue; stateLock.unlock() }
+    }
     /// Arayüz yanıt vermezse bile ESC basılı tutulunca devreye giren acil çıkış.
-    var onFailsafeUnlock: (() -> Void)?
+    private var _onFailsafeUnlock: (() -> Void)?
+    var onFailsafeUnlock: (() -> Void)? {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _onFailsafeUnlock }
+        set { stateLock.lock(); _onFailsafeUnlock = newValue; stateLock.unlock() }
+    }
 
-    private var escapeDown = false
+    private var _escapeDown = false
+    private var escapeDown: Bool {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _escapeDown }
+        set { stateLock.lock(); _escapeDown = newValue; stateLock.unlock() }
+    }
     private var lastMouseSignal = Date.distantPast
     private var lastScrollSignal = Date.distantPast
     private var pendingDX: Double = 0
     private var pendingDY: Double = 0
-    private var escapeSince: Date?
-    private var unlockHold: Double = 2.0
+    private var _escapeSince: Date?
+    private var escapeSince: Date? {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _escapeSince }
+        set { stateLock.lock(); _escapeSince = newValue; stateLock.unlock() }
+    }
+    private var _unlockHold: Double = 2.0
+    private var unlockHold: Double {
+        get { stateLock.lock(); defer { stateLock.unlock() }; return _unlockHold }
+        set { stateLock.lock(); _unlockHold = newValue; stateLock.unlock() }
+    }
 
     private static let escapeKeyCode: Int64 = 53
 
@@ -92,18 +128,26 @@ final class InputLocker {
             },
             userInfo: refcon
         ) else {
+            self.owner = nil
             return false   // Genellikle Erişilebilirlik izni yok demektir.
         }
 
+        guard let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0) else {
+            CFMachPortInvalidate(tap)
+            self.tap = nil
+            self.owner = nil
+            return false
+        }
+
         self.tap = tap
-        self.source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
+        self.source = source
         escapeDown = false
         isRunning = true
 
         // Tap geri çağrımını ana iş parçacığından ayrı tut: arayüz takılsa bile
         // olaylar zamanında yutulur (aksi hâlde macOS tap'i devre dışı bırakır).
         let t = Thread { [weak self] in
-            guard let self, let source = self.source else { return }
+            guard let self else { return }
             self.loop = CFRunLoopGetCurrent()
             CFRunLoopAddSource(CFRunLoopGetCurrent(), source, .commonModes)
             CGEvent.tapEnable(tap: tap, enable: true)
@@ -134,24 +178,31 @@ final class InputLocker {
         source = nil
         tap = nil
         escapeDown = false
-        stateLock.lock(); escapeSince = nil; stateLock.unlock()
+        escapeSince = nil
     }
 
     /// Ana iş parçacığı donsa bile ESC uzun basımı kilidi açar.
     private func checkFailsafe() {
         stateLock.lock()
-        let since = escapeSince
-        let hold = unlockHold
+        let running = _isRunning
+        let fired = _failsafeFired
+        let since = _escapeSince
+        let hold = _unlockHold
+        guard running, !fired, let since,
+              Date().timeIntervalSince(since) > hold + 1.0 else {
+            stateLock.unlock()
+            return
+        }
+        _failsafeFired = true
+        let tap = _tap
         stateLock.unlock()
-        guard isRunning, !failsafeFired, let since else { return }
-        guard Date().timeIntervalSince(since) > hold + 1.0 else { return }
 
         // Girdiyi hemen serbest bırak, ama tap/iş parçacığı temizliğini ana kuyruğa
         // bırak: buradan teardown yapmak zombi iş parçacığı bırakıyor ve sonraki
         // oturum kendi kendine açılıyordu.
-        failsafeFired = true
         if let tap { CGEvent.tapEnable(tap: tap, enable: false) }
-        DispatchQueue.main.async { [weak self] in self?.onFailsafeUnlock?() }
+        let callback = onFailsafeUnlock
+        DispatchQueue.main.async { callback?() }
     }
 
     // MARK: - Olay işleme
@@ -166,8 +217,9 @@ final class InputLocker {
             // kilit kendi kendine açılmasın.
             if escapeDown {
                 escapeDown = false
-                stateLock.lock(); escapeSince = nil; stateLock.unlock()
-                DispatchQueue.main.async { [weak self] in self?.onEscapeChanged?(false) }
+                escapeSince = nil
+                let callback = onEscapeChanged
+                DispatchQueue.main.async { callback?(false) }
             }
             return nil
         }
@@ -179,10 +231,9 @@ final class InputLocker {
                 let down = (type == .keyDown)
                 if down != escapeDown {
                     escapeDown = down
-                    stateLock.lock()
                     escapeSince = down ? Date() : nil
-                    stateLock.unlock()
-                    DispatchQueue.main.async { [weak self] in self?.onEscapeChanged?(down) }
+                    let callback = onEscapeChanged
+                    DispatchQueue.main.async { callback?(down) }
                 }
                 return nil   // ESC de dışarı sızmasın
             }
@@ -224,6 +275,7 @@ final class InputLocker {
         }
 
         guard let signal else { return }
-        DispatchQueue.main.async { [weak self] in self?.onSignal?(signal) }
+        let callback = onSignal
+        DispatchQueue.main.async { callback?(signal) }
     }
 }

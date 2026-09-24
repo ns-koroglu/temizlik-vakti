@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Combine
 
 /// İlk çalıştırmada bir kez açılan karşılama penceresi.
 /// Menü çubuğu uygulaması olduğu için, kurulumdan sonra hiçbir şey görünmüyordu:

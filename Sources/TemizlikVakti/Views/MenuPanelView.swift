@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 struct MenuPanelView: View {
     @EnvironmentObject var prefs: Prefs
@@ -210,7 +211,7 @@ struct MenuPanelView: View {
                 Button(s.breakResume) { breaks.resume() }
             } else {
                 Button(s.breakPauseHour) { breaks.pause(hours: 1) }
-                    .disabled(!prefs.breakEnabled)
+                    .disabled(!prefs.breakEnabled || breaks.isResting)
             }
         }
         .controlSize(.regular)
