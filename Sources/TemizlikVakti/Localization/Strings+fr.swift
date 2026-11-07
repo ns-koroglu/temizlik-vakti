@@ -104,7 +104,7 @@ extension TVStrings {
             "Il y a tout un écosystème sous la barre d'espace.",
             "Pas de nettoyant à vitres : eau distillée et microfibre.",
             "N'oublie pas les grilles d'aération — le musée de la poussière.",
-            "Même ta puce M3 a honte de cette saleté.",
+            "Même ton processeur a honte de cette saleté.",
             "Et maintenant le logo Apple sur le capot. Il doit briller.",
             "Chiffon humide, pas mouillé. La différence, c'est ta garantie."
         ],

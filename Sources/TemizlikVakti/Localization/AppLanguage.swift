@@ -1,6 +1,7 @@
 import Foundation
 
-/// Desteklenen diller. Varsayılan ve geri düşüş dili her zaman Türkçe.
+/// Desteklenen diller. Sistem dili listede yoksa İngilizceye düşülür:
+/// dünyanın her yerinden indirilen bir uygulamada en geniş kitlenin okuyabildiği dil.
 enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
     case tr, en, de, es, fr, it, pt, ru, zh, ja
 
@@ -53,7 +54,7 @@ enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// Sistem dilini eşleştirir; listede yoksa Türkçe döner.
+    /// Sistem dilini eşleştirir; listede yoksa İngilizce döner.
     static func fromSystem() -> AppLanguage {
         let preferred = (UserDefaults.standard.stringArray(forKey: "AppleLanguages")
                          ?? Locale.preferredLanguages)
@@ -63,6 +64,6 @@ enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
                 return match
             }
         }
-        return .tr
+        return .en
     }
 }

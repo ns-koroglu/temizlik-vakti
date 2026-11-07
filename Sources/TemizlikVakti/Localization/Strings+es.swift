@@ -104,7 +104,7 @@ extension TVStrings {
             "Bajo la barra espaciadora hay todo un ecosistema.",
             "Limpiacristales no: agua destilada y microfibra.",
             "No olvides las rejillas de ventilación, el museo del polvo.",
-            "Hasta tu chip M3 se avergüenza de esta suciedad.",
+            "Hasta tu procesador se avergüenza de esta suciedad.",
             "Ahora el logo de Apple de la tapa. Tiene que brillar.",
             "Paño húmedo, no mojado. La diferencia es tu garantía."
         ],

@@ -7,7 +7,7 @@ yorumlar.
 
 [![Sürüm](https://img.shields.io/github/v/release/ns-koroglu/temizlik-vakti)](https://github.com/ns-koroglu/temizlik-vakti/releases)
 [![Lisans](https://img.shields.io/github/license/ns-koroglu/temizlik-vakti)](LICENSE)
-macOS 14+ · Apple Silicon ve Intel · SwiftUI
+macOS 14+ · Apple Silicon ve Intel · SwiftUI · **Ücretsiz ve açık kaynak (MIT)**
 
 | Kilit ekranı | Göz molası | Karşılama |
 |---|---|---|
@@ -137,11 +137,11 @@ Kilit ekranındayken:
 
 ## Diller
 
-🇹🇷 Türkçe (varsayılan) · 🇬🇧 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français ·
+🇹🇷 Türkçe · 🇬🇧 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français ·
 🇮🇹 Italiano · 🇵🇹 Português · 🇷🇺 Русский · 🇨🇳 简体中文 · 🇯🇵 日本語
 
-Açılışta **sistem diline** göre ayarlanır; sistem dili bu onun dışındaysa **Türkçe**
-kullanılır. Elle de seçilebilir, seçim kaydedilir ve anında uygulanır.
+Açılışta **sistem diline** göre ayarlanır; sistem dili bu on dilden biri değilse
+**İngilizce** kullanılır. Elle de seçilebilir, seçim kaydedilir ve anında uygulanır.
 
 Çeviriler `Sources/TemizlikVakti/Localization/` altında, dil başına tek dosya. Metinler
 tek bir `struct` üzerinden tutulduğu için **eksik çeviri mümkün değil**: yeni bir metin
@@ -305,7 +305,7 @@ eggs hidden in there.
 
 Available in 10 languages (Turkish, English, German, Spanish, French, Italian,
 Portuguese, Russian, Chinese, Japanese) — it follows your system language and falls back
-to Turkish. Requires Accessibility permission; the lock dies with the process, so a crash
+to English. Requires Accessibility permission; the lock dies with the process, so a crash
 or quit always restores input. Signed with hardened runtime; nothing leaves your Mac.
 
 Download from [Releases](https://github.com/ns-koroglu/temizlik-vakti/releases) or build

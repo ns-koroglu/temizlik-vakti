@@ -104,7 +104,7 @@ extension TVStrings {
             "Unter der Leertaste lebt ein ganzes Ökosystem.",
             "Nicht Glasreiniger: destilliertes Wasser und Mikrofaser.",
             "Vergiss die Lüftungsschlitze nicht — das Staubmuseum.",
-            "Sogar dein M3-Chip schämt sich für diesen Dreck.",
+            "Sogar dein Prozessor schämt sich für diesen Dreck.",
             "Jetzt noch das Apple-Logo auf dem Deckel. Das muss glänzen.",
             "Feuchtes Tuch, nicht nasses. Der Unterschied ist deine Garantie."
         ],

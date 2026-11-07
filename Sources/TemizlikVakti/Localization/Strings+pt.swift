@@ -104,7 +104,7 @@ extension TVStrings {
             "Embaixo da barra de espaço existe um ecossistema inteiro.",
             "Nada de limpa-vidros: água destilada e microfibra.",
             "Não esqueça as saídas de ar — o museu da poeira.",
-            "Até o seu chip M3 ficou com vergonha dessa sujeira.",
+            "Até o seu processador ficou com vergonha dessa sujeira.",
             "Agora o logo da Apple na tampa. Tem que brilhar.",
             "Pano úmido, não molhado. A diferença é a sua garantia."
         ],

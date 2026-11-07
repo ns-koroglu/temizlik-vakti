@@ -129,7 +129,7 @@ extension TVStrings {
             "That grease spot… what did you have for breakfast?",
             "Don't forget the vents — the dust museum.",
             "The gap by the hinge. Yes, that one.",
-            "Even your M3 chip is embarrassed by this.",
+            "Even your processor is embarrassed by this.",
             "You're doing great, by the way. Kidding — look to the left.",
             "Not glass cleaner: distilled water and microfibre.",
             "That dot might be a dead pixel, not dust. Joking. Probably.",

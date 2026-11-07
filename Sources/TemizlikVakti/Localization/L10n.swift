@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Aktif dili tutar. "system" seçiliyken sistem diline uyar,
-/// sistem dili desteklenmiyorsa Türkçe kullanılır.
+/// sistem dili desteklenmiyorsa İngilizce kullanılır.
 @MainActor
 final class L10n: ObservableObject {
     static let shared = L10n()
@@ -30,7 +30,7 @@ final class L10n: ObservableObject {
     private func refresh() {
         let language = (selection == L10n.systemKey)
             ? AppLanguage.fromSystem()
-            : (AppLanguage(rawValue: selection) ?? .tr)
+            : (AppLanguage(rawValue: selection) ?? AppLanguage.fromSystem())
         current = language
         s = TVStrings.table[language] ?? .turkish
     }

@@ -104,7 +104,7 @@ extension TVStrings {
             "Sotto la barra spaziatrice vive un intero ecosistema.",
             "Non detergente per vetri: acqua distillata e microfibra.",
             "Non dimenticare le griglie di ventilazione, il museo della polvere.",
-            "Perfino il tuo chip M3 si vergogna di questo sporco.",
+            "Perfino il tuo processore si vergogna di questo sporco.",
             "Ora il logo Apple sul coperchio. Deve brillare.",
             "Panno umido, non bagnato. La differenza è la garanzia."
         ],

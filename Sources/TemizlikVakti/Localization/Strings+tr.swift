@@ -129,7 +129,7 @@ extension TVStrings {
             "Şu yağ lekesi… kahvaltıda ne yedin?",
             "Fan deliklerini de unutma, orası toz müzesi.",
             "Kapak menteşesinin arası. Evet, orası.",
-            "M3 çipin bile bu kirden utandı.",
+            "İşlemcin bile bu kirden utandı.",
             "Bu arada güzel gidiyorsun. Şaka yaptım, sol tarafa bak.",
             "Cam temizleyici değil, damıtılmış su + mikrofiber.",
             "Ekranda gördüğün nokta toz değil, kırık piksel olabilir. Şaka. Belki.",

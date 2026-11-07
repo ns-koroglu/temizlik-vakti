@@ -17,7 +17,7 @@ struct MenuPanelView: View {
         VStack(alignment: .leading, spacing: 14) {
             header
 
-            Picker("", selection: $tab) {
+            Picker(s.tabCleaning + " / " + s.tabBreak, selection: $tab) {
                 Text(s.tabCleaning).tag(0)
                 Text(s.tabBreak).tag(1)
             }
@@ -79,7 +79,7 @@ struct MenuPanelView: View {
 
     private var languageMenu: some View {
         Menu {
-            Picker("", selection: $l10n.selection) {
+            Picker(s.language, selection: $l10n.selection) {
                 Text(String(format: s.systemLanguage, l10n.systemResolvedName))
                     .tag(L10n.systemKey)
                 Divider()
@@ -107,7 +107,7 @@ struct MenuPanelView: View {
             Text(s.durationLabel)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
-            Picker("", selection: $prefs.duration) {
+            Picker(s.durationLabel, selection: $prefs.duration) {
                 ForEach(Prefs.durationChoices(s), id: \.value) { choice in
                     Text(choice.label).tag(choice.value)
                 }
@@ -118,7 +118,7 @@ struct MenuPanelView: View {
             Text(s.themeLabel)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
-            Picker("", selection: $prefs.theme) {
+            Picker(s.themeLabel, selection: $prefs.theme) {
                 ForEach(ShieldTheme.allCases) { t in Text(t.short(s)).tag(t) }
             }
             .labelsHidden()
@@ -174,7 +174,7 @@ struct MenuPanelView: View {
             HStack {
                 Text(s.breakWork).font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
                 Spacer()
-                Picker("", selection: $prefs.workMinutes) {
+                Picker(s.breakWork, selection: $prefs.workMinutes) {
                     ForEach(Prefs.workChoices(s), id: \.value) { c in Text(c.label).tag(c.value) }
                 }
                 .labelsHidden().pickerStyle(.menu).frame(width: 130)
@@ -183,7 +183,7 @@ struct MenuPanelView: View {
             HStack {
                 Text(s.breakLength).font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
                 Spacer()
-                Picker("", selection: $prefs.breakSeconds) {
+                Picker(s.breakLength, selection: $prefs.breakSeconds) {
                     ForEach(Prefs.breakChoices(s), id: \.value) { c in Text(c.label).tag(c.value) }
                 }
                 .labelsHidden().pickerStyle(.menu).frame(width: 130)
